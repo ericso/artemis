@@ -1,11 +1,11 @@
-# Prometheus
+# Artemis
 
 A monorepo containing a full-stack TypeScript application with Express backend and Vue.js frontend.
 
 ## Project Structure
 
 ```
-prometheus/
+artemis/
 ├── backend/         # Express.js + TypeScript backend
 ├── frontend/        # Vue.js frontend
 └── README.md       # This file
@@ -32,7 +32,7 @@ npm install
 Create a `.env` file in the `backend` directory with:
 ```env
 PORT=3000
-DATABASE_URL=postgresql://user:password@localhost:5432/prometheus
+DATABASE_URL=postgresql://user:password@localhost:5432/artemis
 JWT_SECRET=your_secure_secret_key  # Required in production, defaults to 'just-for-dev' in development
 
 # Alternative Database Configuration

@@ -1,6 +1,6 @@
-# Prometheus Backend
+# Artemis Backend
 
-The backend service for Prometheus, built with Express.js and TypeScript. This service handles authentication, data persistence, and business logic for the Prometheus application.
+The backend service for Artemis, built with Express.js and TypeScript. This service handles authentication, data persistence, and business logic for the Artemis application.
 
 ## Application Structure
 

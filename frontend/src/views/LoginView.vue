@@ -1,0 +1,138 @@
+<template>
+  <div class="login">
+    <h1>Login</h1>
+    <form @submit.prevent="handleSubmit" class="login-form">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          v-model="email"
+          type="email"
+          required
+          placeholder="Enter your email"
+          :disabled="loading"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          v-model="password"
+          type="password"
+          required
+          placeholder="Enter your password"
+          :disabled="loading"
+        />
+      </div>
+
+      <div v-if="error" class="error">{{ error }}</div>
+
+      <button type="submit" :disabled="loading">
+        {{ loading ? 'Logging in...' : 'Login' }}
+      </button>
+
+      <div class="register-link">
+        Don't have an account? <RouterLink to="/register">Create one</RouterLink>
+      </div>
+    </form>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+const email = ref('')
+const password = ref('')
+
+const loading = computed(() => authStore.loading)
+const error = computed(() => authStore.error)
+
+async function handleSubmit() {
+  const success = await authStore.login(email.value, password.value)
+  if (success) {
+    router.push('/dashboard')
+  }
+}
+</script>
+
+<style scoped>
+.login {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #42b983;
+}
+
+button {
+  background-color: #42b983;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button:hover:not(:disabled) {
+  background-color: #3aa876;
+}
+
+button:disabled {
+  background-color: #a8d5c2;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #dc3545;
+  font-size: 14px;
+}
+
+.register-link {
+  text-align: center;
+  font-size: 14px;
+}
+
+.register-link a {
+  color: #42b983;
+  text-decoration: none;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}
+</style> 

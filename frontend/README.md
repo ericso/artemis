@@ -1,4 +1,4 @@
-# Prometheus Frontend
+# Artemis Frontend
 
 A modern Vue.js frontend application for user authentication and management, built with Vue 3, TypeScript, and Pinia.
 
@@ -30,7 +30,7 @@ A modern Vue.js frontend application for user authentication and management, bui
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd prometheus/frontend
+cd artemis/frontend
 ```
 
 2. Install dependencies:
@@ -183,7 +183,7 @@ The workflow configuration can be found in `.github/workflows/test.yml`.
 
 ### Status Badges
 
-[![Frontend Tests](https://github.com/ericso/prometheus/actions/workflows/test.yml/badge.svg)](https://github.com/<username>/prometheus/actions/workflows/test.yml)
+[![Frontend Tests](https://github.com/ericso/artemis/actions/workflows/test.yml/badge.svg)](https://github.com/<username>/artemis/actions/workflows/test.yml)
 
 ## License
 

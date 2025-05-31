@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["backend/src/*"],
+      "@routes/*": ["backend/src/routes/*"],
+      "@middleware/*": ["backend/src/middleware/*"],
+      "@controllers/*": ["backend/src/controllers/*"],
+      "@models/*": ["backend/src/models/*"],
+      "@services/*": ["backend/src/services/*"],
+      "@utils/*": ["backend/src/utils/*"],
+      "@config/*": ["backend/src/config/*"],
+      "@db/*": ["backend/src/db/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+} 

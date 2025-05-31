@@ -8,7 +8,7 @@ export async function up(db: Pool = pool): Promise<void> {
       make VARCHAR NOT NULL,
       model VARCHAR NOT NULL,
       year INTEGER NOT NULL,
-      vin VARCHAR UNIQUE DEFAULT NULL,
+      vin VARCHAR DEFAULT NULL,
       name VARCHAR NULL,
       user_id UUID NOT NULL,
       created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

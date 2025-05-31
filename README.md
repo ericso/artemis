@@ -96,6 +96,7 @@ The application uses a simple migration system located in `backend/src/db/migrat
 
 Current migrations:
 1. Create users table (`001_create_users_table`)
+2. Create cars table (`002_create_cars_table`) - Stores vehicle information with user ownership
 
 To create new migrations, add them to the `backend/src/db/migrations` directory and update the `migrate.ts` file accordingly.
 

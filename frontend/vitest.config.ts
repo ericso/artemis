@@ -6,10 +6,14 @@ export default mergeConfig(
   viteConfig,
   defineConfig({
     test: {
+      globals: true,
       environment: 'jsdom',
+      setupFiles: ['./src/setupTests.ts'],
       exclude: [...configDefaults.exclude, 'e2e/**'],
       root: fileURLToPath(new URL('./', import.meta.url)),
-      setupFiles: ['./test-setup.ts'],
+      deps: {
+        inline: ['@testing-library/jest-dom']
+      }
     },
   }),
 )

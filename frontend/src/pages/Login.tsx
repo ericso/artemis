@@ -53,7 +53,7 @@ function Login() {
         </button>
 
         <div className="register-link">
-          Don't have an account? <Link to="/register">Create one</Link>
+          Don&apos;t have an account? <Link to="/register">Create one</Link>
         </div>
       </form>
     </div>

@@ -1,23 +1,23 @@
 # Artemis Frontend
 
-A modern Vue.js frontend application for user authentication and management, built with Vue 3, TypeScript, and Pinia.
+A modern React frontend application for user authentication and management, built with React, TypeScript, and Context API.
 
 ## Features
 
 - 🔐 Secure JWT-based authentication
 - 📱 Responsive design
 - 🎯 Type-safe development with TypeScript
-- 🏪 State management with Pinia
+- 🏪 State management with Context API
 - 🧪 Comprehensive test coverage
-- 🛣️ Vue Router with navigation guards
+- 🛣️ React Router with protected routes
 
 ## Tech Stack
 
-- Vue.js 3.x with Composition API
+- React 18.x
 - TypeScript
-- Pinia for state management
-- Vue Router for navigation
-- Vitest for unit testing
+- React Context API for state management
+- React Router for navigation
+- Vitest + React Testing Library for unit testing
 - Axios for API communication
 
 ## Prerequisites
@@ -66,16 +66,16 @@ The application will be available at `http://localhost:5173`.
 frontend/
 ├── src/
 │   ├── assets/          # Static assets
-│   ├── components/      # Reusable Vue components
-│   ├── router/          # Vue Router configuration
-│   ├── stores/          # Pinia stores
-│   ├── services/        # API services
-│   ├── views/           # Page components
-│   ├── App.vue         # Root component
-│   └── main.ts         # Application entry point
-├── public/             # Public static assets
-├── tests/              # Test files
-└── env.d.ts           # Environment variables types
+│   ├── components/      # Reusable React components
+│   ├── pages/          # Page components
+│   ├── router/         # React Router configuration
+│   ├── stores/         # Context providers
+│   ├── services/       # API services
+│   ├── App.tsx        # Root component
+│   └── main.tsx       # Application entry point
+├── public/            # Public static assets
+├── tests/             # Test files
+└── env.d.ts          # Environment variables types
 ```
 
 ## Authentication
@@ -90,12 +90,12 @@ The application uses JWT-based authentication. The auth flow includes:
 
 ### Protected Routes
 
-Routes can be protected using meta fields:
+Routes can be protected using the `ProtectedRoute` component:
 
 ```typescript
 {
   path: '/dashboard',
-  meta: { requiresAuth: true }
+  element: <ProtectedRoute><Dashboard /></ProtectedRoute>
 }
 ```
 
@@ -106,20 +106,20 @@ Routes that should only be accessible to non-authenticated users:
 ```typescript
 {
   path: '/login',
-  meta: { requiresGuest: true }
+  element: <GuestRoute><Login /></GuestRoute>
 }
 ```
 
 ## State Management
 
-The application uses Pinia for state management. The main stores are:
+The application uses React Context API for state management. The main contexts are:
 
-- `auth` - Handles authentication state and operations
-- Additional stores can be added as needed
+- `AuthContext` - Handles authentication state and operations
+- Additional contexts can be added as needed
 
 ## Testing
 
-The application includes comprehensive unit tests using Vitest. Test files are co-located with their respective components/modules with the `.spec.ts` extension.
+The application includes comprehensive unit tests using Vitest and React Testing Library. Test files are co-located with their respective components/modules with the `.test.tsx` extension.
 
 ### Running Tests
 
@@ -137,13 +137,12 @@ npm run test:unit -- --coverage
 ### Test Structure
 
 - Component tests: `src/components/__tests__/`
-- Store tests: `src/stores/__tests__/`
-- View tests: `src/views/__tests__/`
-- Router guard tests: `src/router/__tests__/`
+- Page tests: `src/pages/__tests__/`
+- Context tests: `src/stores/__tests__/`
 
 ## API Integration
 
-The application communicates with the backend API using Axios. The base configuration can be found in `src/services/api.ts`.
+The application communicates with the backend API using Axios. The base configuration can be found in `src/stores/AuthContext.tsx`.
 
 ## Contributing
 

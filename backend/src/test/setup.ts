@@ -4,7 +4,8 @@ import { readFileSync } from 'fs';
 
 // Load the tsconfig.json
 const baseUrl = resolve(__dirname, '..');
-const tsConfig = JSON.parse(readFileSync('../../tsconfig.json', 'utf-8'));
+const tsConfigPath = resolve(__dirname, '../../tsconfig.json');
+const tsConfig = JSON.parse(readFileSync(tsConfigPath, 'utf-8'));
 const { paths } = tsConfig.compilerOptions;
 
 // Register the path aliases

@@ -17,9 +17,12 @@ const config: Config.InitialOptions = {
   },
   testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
   transform: {
-    '^.+\\.ts$': 'ts-jest'
+    '^.+\\.ts$': ['ts-jest', {
+      tsconfig: 'tsconfig.json'
+    }]
   },
-  moduleDirectories: ['node_modules', 'src']
+  moduleDirectories: ['node_modules', 'src'],
+  setupFiles: ['<rootDir>/src/test/setup.ts']
 };
 
 export default config; 

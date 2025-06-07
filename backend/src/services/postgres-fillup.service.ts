@@ -3,12 +3,26 @@ import { Fillup } from '@models/fillup';
 import { FillupService } from '@services/fillup.service';
 import { pool } from '@config/database';
 
+interface FillupRow {
+  id: string;
+  car_id: string;
+  date: Date;
+  gallons: number;
+  total_cost: number;
+  odometer_reading: number;
+  station_address: string;
+  notes: string | null;
+  created_at: Date;
+  updated_at: Date | null;
+  deleted_at: Date | null;
+}
+
 export class PostgresFillupService implements FillupService {
   constructor(private db: Pool = pool) {}
 
   async findById(id: string): Promise<Fillup | undefined> {
     const query = 'SELECT * FROM fillups WHERE id = $1 AND deleted_at IS NULL';
-    const result = await this.db.query(query, [id]);
+    const result = await this.db.query<FillupRow>(query, [id]);
     
     if (result.rows.length === 0) {
       return undefined;
@@ -19,7 +33,7 @@ export class PostgresFillupService implements FillupService {
 
   async findByCarId(carId: string): Promise<Fillup[]> {
     const query = 'SELECT * FROM fillups WHERE car_id = $1 AND deleted_at IS NULL ORDER BY date DESC';
-    const result = await this.db.query(query, [carId]);
+    const result = await this.db.query<FillupRow>(query, [carId]);
     
     return result.rows.map(this.mapRowToFillup);
   }
@@ -45,14 +59,14 @@ export class PostgresFillupService implements FillupService {
       fillup.notes
     ];
 
-    const result = await this.db.query(query, values);
+    const result = await this.db.query<FillupRow>(query, values);
     return this.mapRowToFillup(result.rows[0]);
   }
 
   async update(id: string, fillup: Partial<Fillup>): Promise<Fillup | undefined> {
     // Build the update query dynamically based on the provided fields
     const updates: string[] = [];
-    const values: any[] = [];
+    const values: (string | number | Date | null)[] = [];
     let paramCount = 1;
 
     // Add each field that is present in the update object
@@ -103,7 +117,7 @@ export class PostgresFillupService implements FillupService {
       RETURNING *
     `;
 
-    const result = await this.db.query(query, values);
+    const result = await this.db.query<FillupRow>(query, values);
 
     if (result.rows.length === 0) {
       return undefined;
@@ -121,7 +135,7 @@ export class PostgresFillupService implements FillupService {
     await this.db.query(query, [id]);
   }
 
-  private mapRowToFillup(row: any): Fillup {
+  private mapRowToFillup(row: FillupRow): Fillup {
     return {
       id: row.id,
       car_id: row.car_id,

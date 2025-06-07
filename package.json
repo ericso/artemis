@@ -14,6 +14,19 @@
     "build": "npm run build --workspaces",
     "test": "npm run test --workspace=backend && npm run test:unit --workspace=frontend",
     "test:e2e": "npm run test:e2e --workspace=frontend",
-    "test:all": "npm run test && npm run test:e2e"
+    "test:all": "npm run test && npm run test:e2e",
+    "lint": "npm run lint --workspaces",
+    "lint:fix": "npm run lint --workspaces",
+    "type-check": "npm run type-check --workspaces"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.56.0",
+    "eslint-plugin-cypress": "^2.15.1",
+    "eslint-plugin-react": "^7.34.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-vitest": "^0.3.20",
+    "typescript": "~5.0.4"
   }
 }

@@ -3,6 +3,19 @@ import { Car } from '@models/car';
 import { CarService } from '@services/car.service';
 import { pool } from '@config/database';
 
+interface CarRow {
+  id: string;
+  make: string;
+  model: string;
+  year: number;
+  vin: string;
+  name: string;
+  user_id: string;
+  created_at: Date;
+  updated_at: Date;
+  deleted_at: Date | null;
+}
+
 export class PostgresCarService implements CarService {
   constructor(private db: Pool = pool) {}
 
@@ -40,7 +53,7 @@ export class PostgresCarService implements CarService {
   async update(id: string, car: Partial<Car>): Promise<Car | undefined> {
     // Build the update query dynamically based on the provided fields
     const updates: string[] = [];
-    const values: any[] = [];
+    const values: (string | number | null)[] = [];
     let paramCount = 1;
 
     // Add each field that is present in the update object
@@ -101,7 +114,7 @@ export class PostgresCarService implements CarService {
     await this.db.query(query, [id]);
   }
 
-  private mapRowToCar(row: any): Car {
+  private mapRowToCar(row: CarRow): Car {
     return {
       id: row.id,
       make: row.make,

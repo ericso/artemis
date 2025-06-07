@@ -5,10 +5,24 @@ import { UserService } from '@services/user.service';
 import { User } from '@models/user';
 import { PostgresUserService } from '@services/postgres-user.service';
 
+export interface AuthRequestBody {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  message: string;
+  token: string;
+  user: {
+    id: string;
+    email: string;
+  };
+}
+
 export class AuthController {
   constructor(private userService: UserService = new PostgresUserService()) {}
 
-  register = async (req: Request, res: Response): Promise<Response> => {
+  register = async (req: Request<Record<string, never>, AuthResponse, AuthRequestBody>, res: Response): Promise<Response> => {
     try {
       const { email, password } = req.body;
 
@@ -43,7 +57,7 @@ export class AuthController {
     }
   };
 
-  login = async (req: Request, res: Response): Promise<Response> => {
+  login = async (req: Request<Record<string, never>, AuthResponse, AuthRequestBody>, res: Response): Promise<Response> => {
     try {
       const { email, password } = req.body;
 

@@ -3,11 +3,12 @@ node_modules/
 
 # Build output
 dist/
+dist-ssr/
 
 # Environment variables
 .env
 .env.local
-.env.*.local
+.env.*
 
 # Logs
 logs
@@ -15,19 +16,32 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
 # IDE and editor files
 .idea/
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 *.swp
 *.swo
 .DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# Coverage directory
+# Test artifacts
 coverage/
+/cypress/videos/
+/cypress/screenshots/
 
 # Optional npm cache directory
 .npm
 
 # Optional eslint cache
-.eslintcache 
+.eslintcache
+
+# TypeScript
+*.tsbuildinfo 

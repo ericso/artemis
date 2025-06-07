@@ -12,7 +12,8 @@
     "test:coverage": "jest --coverage",
     "migrate": "ts-node -r tsconfig-paths/register -P tsconfig-paths.json src/db/migrate.ts",
     "migrate:down": "ts-node -r tsconfig-paths/register -P tsconfig-paths.json src/db/migrate.ts down",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "lint": "eslint --fix \"src/**/*.ts\""
   },
   "type": "commonjs",
   "dependencies": {

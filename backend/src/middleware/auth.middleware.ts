@@ -2,8 +2,15 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '@config/auth.config';
 
+interface JWTPayload {
+  id: string;
+  email: string;
+  iat?: number;
+  exp?: number;
+}
+
 export interface AuthRequest extends Request {
-  user?: any;
+  user?: JWTPayload;
 }
 
 export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -14,7 +21,7 @@ export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction)
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload;
     req.user = decoded;
     next();
   } catch (err) {

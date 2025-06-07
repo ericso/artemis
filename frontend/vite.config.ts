@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, UserConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
 
@@ -13,4 +13,4 @@ export default defineConfig({
   server: {
     port: parseInt(process.env.VITE_PORT || '5173')
   }
-} as any)
+} satisfies UserConfig)

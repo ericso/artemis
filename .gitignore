@@ -34,8 +34,6 @@ lerna-debug.log*
 
 # Test artifacts
 coverage/
-/cypress/videos/
-/cypress/screenshots/
 
 # Optional npm cache directory
 .npm

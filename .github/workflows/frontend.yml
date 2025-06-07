@@ -38,7 +38,7 @@ jobs:
       run: npm ci
 
     - name: Run unit tests
-      run: npm run test:unit --workspace=frontend -- --run
+      run: npm run test --workspace=frontend
       env:
         NODE_OPTIONS: --experimental-vm-modules
         VITEST_MAX_THREADS: 1

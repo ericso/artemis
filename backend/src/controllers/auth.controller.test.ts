@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AuthController } from '@controllers/auth.controller';
+import { AuthController, AuthRequestBody, AuthResponse } from '@controllers/auth.controller';
 import { UserService } from '@services/user.service';
 import { hashPassword, comparePassword, generateToken } from '@utils/auth.utils';
 import { User } from '@models/user';
@@ -11,9 +11,11 @@ jest.mock('@utils/auth.utils', () => ({
   generateToken: jest.fn()
 }));
 
+type AuthRequest = Request<Record<string, never>, AuthResponse, AuthRequestBody>;
+
 describe('AuthController', () => {
-  let mockRequest: Partial<Request>;
-  let mockResponse: Partial<Response>;
+  let mockRequest: Partial<AuthRequest>;
+  let mockResponse: Partial<Response<AuthResponse>>;
   let mockUserService: jest.Mocked<UserService>;
   let authController: AuthController;
 
@@ -27,7 +29,7 @@ describe('AuthController', () => {
     authController = new AuthController(mockUserService);
 
     mockRequest = {
-      body: {}
+      body: {} as AuthRequestBody
     };
     
     mockResponse = {
@@ -56,7 +58,7 @@ describe('AuthController', () => {
       (hashPassword as jest.Mock).mockResolvedValue('hashedPassword');
       (generateToken as jest.Mock).mockReturnValue('mockToken');
 
-      await authController.register(mockRequest as Request, mockResponse as Response);
+      await authController.register(mockRequest as AuthRequest, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(201);
       expect(mockUserService.create).toHaveBeenCalled();
@@ -77,7 +79,7 @@ describe('AuthController', () => {
         deleted_at: undefined
       });
 
-      await authController.register(mockRequest as Request, mockResponse as Response);
+      await authController.register(mockRequest as AuthRequest, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockUserService.create).not.toHaveBeenCalled();
@@ -88,7 +90,7 @@ describe('AuthController', () => {
       mockUserService.findByEmail.mockResolvedValue(undefined);
       (hashPassword as jest.Mock).mockRejectedValue(new Error('Hash failed'));
 
-      await authController.register(mockRequest as Request, mockResponse as Response);
+      await authController.register(mockRequest as AuthRequest, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(500);
       expect(mockUserService.create).not.toHaveBeenCalled();
@@ -114,7 +116,7 @@ describe('AuthController', () => {
       (comparePassword as jest.Mock).mockResolvedValue(true);
       (generateToken as jest.Mock).mockReturnValue('loginToken');
 
-      await authController.login(mockRequest as Request, mockResponse as Response);
+      await authController.login(mockRequest as AuthRequest, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith(expect.objectContaining({
@@ -134,7 +136,7 @@ describe('AuthController', () => {
       };
       mockUserService.findByEmail.mockResolvedValue(undefined);
 
-      await authController.login(mockRequest as Request, mockResponse as Response);
+      await authController.login(mockRequest as AuthRequest, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(401);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -150,7 +152,7 @@ describe('AuthController', () => {
       // findByEmail will return undefined for soft-deleted users
       mockUserService.findByEmail.mockResolvedValue(undefined);
 
-      await authController.login(mockRequest as Request, mockResponse as Response);
+      await authController.login(mockRequest as AuthRequest, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(401);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -166,7 +168,7 @@ describe('AuthController', () => {
       mockUserService.findByEmail.mockResolvedValue(validUser);
       (comparePassword as jest.Mock).mockResolvedValue(false);
 
-      await authController.login(mockRequest as Request, mockResponse as Response);
+      await authController.login(mockRequest as AuthRequest, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(401);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -181,7 +183,7 @@ describe('AuthController', () => {
       };
       mockUserService.findByEmail.mockRejectedValue(new Error('Database error'));
 
-      await authController.login(mockRequest as Request, mockResponse as Response);
+      await authController.login(mockRequest as AuthRequest, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(500);
       expect(mockResponse.json).toHaveBeenCalledWith({

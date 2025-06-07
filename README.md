@@ -26,3 +26,13 @@ Artemis is split into two main components:
 ## Development
 
 Each component (backend/frontend) has its own development workflow and requirements. Please refer to their respective documentation for detailed instructions.
+
+## Continuous Integration
+
+The project uses GitHub Actions for continuous integration. The following checks are run on each pull request and push to the main branch:
+
+- Unit tests across multiple Node.js versions (16.x, 18.x, 20.x)
+- ESLint code linting
+- TypeScript type checking
+
+The workflow configuration can be found in `.github/workflows/test.yml`.

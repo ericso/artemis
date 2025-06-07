@@ -36,8 +36,7 @@ module.exports = {
       },
       extends: [
         'plugin:react/recommended',
-        'plugin:react-hooks/recommended',
-        'plugin:cypress/recommended'
+        'plugin:react-hooks/recommended'
       ],
       parserOptions: {
         ecmaFeatures: {
@@ -46,8 +45,7 @@ module.exports = {
       },
       plugins: [
         'react',
-        'react-hooks',
-        'cypress'
+        'react-hooks'
       ],
       rules: {
         'react/react-in-jsx-scope': 'off',

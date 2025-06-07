@@ -16,7 +16,8 @@
     "test:e2e": "npm run test:e2e --workspace=frontend",
     "test:all": "npm run test && npm run test:e2e",
     "lint": "npm run lint --workspaces",
-    "lint:fix": "npm run lint --workspaces"
+    "lint:fix": "npm run lint --workspaces",
+    "type-check": "npm run type-check --workspaces"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.21.0",

@@ -5,12 +5,12 @@ import { UserService } from '@services/user.service';
 import { User } from '@models/user';
 import { PostgresUserService } from '@services/postgres-user.service';
 
-interface AuthRequestBody {
+export interface AuthRequestBody {
   email: string;
   password: string;
 }
 
-interface AuthResponse {
+export interface AuthResponse {
   message: string;
   token: string;
   user: {

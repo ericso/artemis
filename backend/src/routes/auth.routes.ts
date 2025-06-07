@@ -1,15 +1,18 @@
-import { Router, Request, Response, RequestHandler } from 'express';
+import { Router, Request, Response } from 'express';
 import { AuthController } from '@controllers/auth.controller';
+import { AuthRequestBody, AuthResponse } from '@controllers/auth.controller';
 
 const router = Router();
 const authController = new AuthController();
 
-router.post('/register', ((req: Request, res: Response) => {
-  void authController.register(req, res);
-}) as RequestHandler);
+type AuthHandler = Request<Record<string, never>, AuthResponse, AuthRequestBody>;
 
-router.post('/login', ((req: Request, res: Response) => {
-  void authController.login(req, res);
-}) as RequestHandler);
+router.post('/register', async (req: AuthHandler, res: Response) => {
+  await authController.register(req, res);
+});
+
+router.post('/login', async (req: AuthHandler, res: Response) => {
+  await authController.login(req, res);
+});
 
 export default router; 

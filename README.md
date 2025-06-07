@@ -1,139 +1,38 @@
 # Artemis
 
-A monorepo containing a full-stack TypeScript application with Express backend and Vue.js frontend.
+An app that tracks your cars and their mileage.
 
 ## Project Structure
 
 ```
 artemis/
-├── backend/         # Express.js + TypeScript backend
-├── frontend/        # Vue.js frontend
-└── README.md       # This file
+├── backend/         # Express.js backend
+├── frontend/        # React frontend
+└── README.md        # This file
 ```
 
-## Backend
+## Overview
 
-The backend service is built with Express.js and TypeScript, featuring:
-- JWT Authentication
-- PostgreSQL Database
-- Database Migrations
-- Development hot-reload
-- Jest Testing Suite
+Artemis is split into two main components:
 
-### Backend Setup
+- **Backend**: Express.js/TypeScript service handling data and business logic. See [backend/README.md](backend/README.md) for setup and development details.
+- **Frontend**: React application providing the user interface. See [frontend/DEVELOPMENT_NOTES.md](frontend/DEVELOPMENT_NOTES.md) for more information.
 
-1. Install dependencies:
-```bash
-cd backend
-npm install
-```
+## Getting Started
 
-2. Configure environment variables:
-Create a `.env` file in the `backend` directory with:
-```env
-PORT=3000
-DATABASE_URL=postgresql://user:password@localhost:5432/artemis
-JWT_SECRET=your_secure_secret_key  # Required in production, defaults to 'just-for-dev' in development
+1. Set up the backend service following instructions in [backend/README.md](backend/README.md)
+2. Set up the frontend application following instructions in [frontend/DEVELOPMENT_NOTES.md](frontend/DEVELOPMENT_NOTES.md)
 
-# Alternative Database Configuration
-DB_USER=your_db_user
-DB_HOST=your_db_host
-DB_NAME=your_db_name
-DB_PASSWORD=your_db_password
-DB_PORT=5432
-```
+## Development
 
-Note: For production environments, always set a secure JWT_SECRET. The default development value should not be used in production.
+Each component (backend/frontend) has its own development workflow and requirements. Please refer to their respective documentation for detailed instructions.
 
-3. Database Setup:
-```bash
-cd backend
-# Run migrations
-npm run migrate
+## Continuous Integration
 
-# Rollback migrations if needed
-npm run migrate:down
-```
+The project uses GitHub Actions for continuous integration. The following checks are run on each pull request and push to the main branch:
 
-⚠️ **Warning**: Down migrations will DROP tables and delete all data. Use with caution, especially in production environments.
+- Unit tests across multiple Node.js versions (16.x, 18.x, 20.x)
+- ESLint code linting
+- TypeScript type checking
 
-### Backend Development
-
-```bash
-cd backend
-npm run dev
-```
-
-### Backend Testing
-
-```bash
-cd backend
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run tests with coverage report
-npm run test:coverage
-```
-
-### Backend Production Build
-
-```bash
-cd backend
-npm run build
-npm start
-```
-
-## Frontend
-
-For frontend development notes and setup instructions, see [frontend/DEVELOPMENT_NOTES.md](frontend/DEVELOPMENT_NOTES.md).
-
-## Database Migrations
-
-The application uses a simple migration system located in `backend/src/db/migrate.ts`. Migrations are executed in order and can be rolled back if needed.
-
-Current migrations:
-1. Create users table (`001_create_users_table`)
-2. Create cars table (`002_create_cars_table`) - Stores vehicle information with user ownership
-
-To create new migrations, add them to the `backend/src/db/migrations` directory and update the `migrate.ts` file accordingly.
-
-### Migration Safety
-
-- **Up migrations** create or modify database structures in a non-destructive way
-- **Down migrations** (rollbacks) will DROP affected tables and DELETE ALL DATA
-- Always backup your database before running migrations in production
-- Test migrations in a development environment first
-
-## Timestamp Conventions
-
-All models in the system follow these timestamp conventions:
-
-### created_at
-- Automatically set when a record is created
-- Non-nullable
-- Set by the database using `DEFAULT CURRENT_TIMESTAMP`
-- Never modified after creation
-
-### updated_at
-- Nullable
-- Initially undefined/null when record is created
-- Only set when the record's data is explicitly updated
-- Not modified during soft deletion
-- Updated via application logic, not database triggers
-
-### deleted_at
-- Nullable
-- Initially undefined/null when record is created
-- Set to current timestamp when record is soft-deleted
-- Never modified once set (no un-deletion)
-- Used to filter out soft-deleted records in queries
-
-These conventions ensure consistent behavior across all models and make it clear:
-- When a record was created
-- If/when it was last modified
-- If/when it was soft-deleted
-
-Example queries should always include `WHERE deleted_at IS NULL` unless specifically querying for deleted records. 
+The workflow configuration can be found in `.github/workflows/test.yml`.

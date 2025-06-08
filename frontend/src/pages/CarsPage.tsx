@@ -88,14 +88,17 @@ export const CarsPage: React.FC = () => {
         justifyContent: 'center',
         alignItems: 'center'
       }}>
-        <div style={{
-          width: '20px',
-          height: '20px',
-          border: '2px solid #3b82f6',
-          borderTopColor: 'transparent',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite'
-        }} />
+        <div 
+          data-testid="loading-spinner"
+          style={{
+            width: '20px',
+            height: '20px',
+            border: '2px solid #3b82f6',
+            borderTopColor: 'transparent',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }} 
+        />
       </div>
     );
   }

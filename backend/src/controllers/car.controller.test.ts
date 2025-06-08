@@ -15,8 +15,12 @@ describe('CarController', () => {
   let mockResponse: Partial<Response>;
   let mockCarService: jest.Mocked<PostgresCarService>;
   let carController: CarController;
+  let consoleErrorSpy: jest.SpyInstance;
 
   beforeEach(() => {
+    // Suppress console.error messages
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
     mockCarService = {
       findById: jest.fn(),
       findByUserId: jest.fn(),
@@ -47,6 +51,10 @@ describe('CarController', () => {
     };
 
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
   });
 
   describe('createCar', () => {

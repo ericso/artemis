@@ -1,6 +1,7 @@
 import express, { Express, Request, Response, NextFunction, RequestHandler } from 'express';
 import cors from 'cors';
 import authRoutes from '@routes/auth.routes';
+import carRoutes from '@routes/car.routes';
 import { verifyToken, AuthRequest } from '@middleware/auth.middleware';
 
 const app: Express = express();
@@ -19,6 +20,7 @@ app.use(cors({
 
 // Routes
 app.use('/auth', authRoutes);
+app.use('/cars', carRoutes);
 
 // Protected route example
 app.get('/protected', [verifyToken as RequestHandler], ((req: AuthRequest, res: Response): void => {

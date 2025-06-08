@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../stores/AuthContext';
-import { CarsPage } from './CarsPage';
+import { useAuth } from '@/stores/AuthContext';
+import { CarsPage } from '@/pages/CarsPage';
 
 function Dashboard() {
   const { user, logout } = useAuth();

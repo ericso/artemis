@@ -10,10 +10,7 @@ export default mergeConfig(
       environment: 'jsdom',
       setupFiles: ['./src/setupTests.ts'],
       exclude: [...configDefaults.exclude, 'e2e/**'],
-      root: fileURLToPath(new URL('./', import.meta.url)),
-      deps: {
-        inline: ['@testing-library/jest-dom']
-      }
+      root: fileURLToPath(new URL('./', import.meta.url))
     },
   }),
 )

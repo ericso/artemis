@@ -14,6 +14,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
     "@vitejs/plugin-react": "^4.5.1",
     "axios": "^1.9.0",
     "react": "^18.2.0",
@@ -22,7 +23,6 @@
     "vite": "^6.3.5"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^14.3.1",
     "@testing-library/user-event": "^14.6.1",
     "@types/react": "^18.2.66",

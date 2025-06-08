@@ -8,7 +8,7 @@ The backend service for Artemis, built with Express.js and TypeScript. This serv
 - PostgreSQL Database
 - Database Migrations
 - Development hot-reload
-- Jest Testing Suite
+- Vitest Testing Suite
 - RESTful API design
 - TypeScript support
 
@@ -56,6 +56,8 @@ npm run dev
 ```
 
 ### Testing
+
+The project uses Vitest for testing.
 
 ```bash
 # Run all tests

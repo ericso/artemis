@@ -29,6 +29,11 @@ vi.mock('../../stores/AuthContext', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>
 }));
 
+// Mock CarsPage component
+vi.mock('../CarsPage', () => ({
+  CarsPage: () => <div data-testid="cars-page">Cars Page Content</div>
+}));
+
 describe('Dashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -52,9 +57,9 @@ describe('Dashboard', () => {
   it('renders dashboard with user info', () => {
     renderDashboard();
     
-    expect(screen.getByText(/dashboard/i)).toBeInTheDocument();
-    expect(screen.getByText(/welcome/i)).toBeInTheDocument();
-    expect(screen.getByText(`Email: ${mockUser?.email}`)).toBeInTheDocument();
+    expect(screen.getByText('Artemis')).toBeInTheDocument();
+    expect(screen.getByText('Cars')).toBeInTheDocument();
+    expect(screen.getByText('test@example.com')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /logout/i })).toBeInTheDocument();
   });
 
@@ -77,7 +82,7 @@ describe('Dashboard', () => {
 
     renderDashboard();
     
-    expect(screen.getByText(`Email: different@example.com`)).toBeInTheDocument();
+    expect(screen.getByText('different@example.com')).toBeInTheDocument();
   });
 
   it('handles missing user data gracefully', () => {
@@ -87,10 +92,16 @@ describe('Dashboard', () => {
     renderDashboard();
     
     // Should still render the basic structure
-    expect(screen.getByText(/dashboard/i)).toBeInTheDocument();
-    expect(screen.getByText(/welcome/i)).toBeInTheDocument();
+    expect(screen.getByText('Artemis')).toBeInTheDocument();
+    expect(screen.getByText('Cars')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /logout/i })).toBeInTheDocument();
     // Email should not be displayed
     expect(screen.queryByText(/test@example\.com/)).not.toBeInTheDocument();
+  });
+
+  it('renders the cars page by default', () => {
+    renderDashboard();
+    
+    expect(screen.getByTestId('cars-page')).toBeInTheDocument();
   });
 }); 

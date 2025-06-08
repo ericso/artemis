@@ -4,6 +4,7 @@ import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
 import { useAuth } from '../stores/AuthContext';
+import GuestRoute from './GuestRoute';
 
 // Protected Route wrapper component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -27,10 +28,18 @@ export const router = createBrowserRouter([
   },
   {
     path: '/login',
-    element: <Login />,
+    element: (
+      <GuestRoute>
+        <Login />
+      </GuestRoute>
+    ),
   },
   {
     path: '/register',
-    element: <Register />,
+    element: (
+      <GuestRoute>
+        <Register />
+      </GuestRoute>
+    ),
   },
 ]); 

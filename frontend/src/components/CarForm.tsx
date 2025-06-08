@@ -44,7 +44,14 @@ export const CarForm: React.FC<CarFormProps> = ({ car, onSubmit, onCancel }) => 
     setIsSubmitting(true);
 
     try {
-      await onSubmit(formData);
+      const submitData = {
+        make: formData.make,
+        model: formData.model,
+        year: formData.year,
+        ...(formData.vin && { vin: formData.vin }),
+        ...(formData.name && { name: formData.name })
+      };
+      await onSubmit(submitData);
       onCancel(); // Close form on success
     } catch (err) {
       setError('Failed to save car. Please try again.');
@@ -54,7 +61,7 @@ export const CarForm: React.FC<CarFormProps> = ({ car, onSubmit, onCancel }) => 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
+    <form role="form" onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
       <div className="space-y-4">
         <div>
           <label htmlFor="make" className="block text-sm font-medium text-gray-700">

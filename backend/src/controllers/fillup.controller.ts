@@ -14,6 +14,51 @@ export class FillupController {
     this.carService = new PostgresCarService();
   }
 
+  getFillups = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const userId = req.user?.id;
+      const { carId } = req.query;
+
+      if (!userId) {
+        res.status(401).json({ message: 'Unauthorized' });
+        return;
+      }
+
+      // If carId is provided, verify the car belongs to the user
+      if (carId) {
+        const car = await this.carService.findById(carId as string);
+        if (!car) {
+          res.status(404).json({ message: 'Car not found' });
+          return;
+        }
+
+        if (car.user_id !== userId) {
+          res.status(403).json({ message: 'Forbidden' });
+          return;
+        }
+
+        const fillups = await this.fillupService.findByCarId(carId as string);
+        res.json(fillups);
+      } else {
+        // If no carId is provided, get all fillups for all user's cars
+        const userCars = await this.carService.findByUserId(userId);
+        const carIds = userCars.map(car => car.id);
+        
+        // Get fillups for all user's cars
+        const fillupPromises = carIds.map(id => this.fillupService.findByCarId(id));
+        const fillupArrays = await Promise.all(fillupPromises);
+        
+        // Flatten the array of arrays into a single array
+        const allFillups = fillupArrays.flat();
+        
+        res.json(allFillups);
+      }
+    } catch (error) {
+      console.error('Error fetching fillups:', error);
+      res.status(500).json({ message: 'Error fetching fillups' });
+    }
+  };
+
   createFillup = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const { car_id, date, gallons, total_cost, odometer_reading, station_address, notes } = req.body;
@@ -76,7 +121,7 @@ export class FillupController {
         return;
       }
 
-      // Check if the car exists and belongs to the user
+      // Then check if the car exists and belongs to the user
       const car = await this.carService.findById(existingFillup.car_id);
       if (!car) {
         res.status(404).json({ message: 'Car not found' });
@@ -86,11 +131,6 @@ export class FillupController {
       if (car.user_id !== userId) {
         res.status(403).json({ message: 'Forbidden' });
         return;
-      }
-
-      // Convert date string to Date object if it's being updated
-      if (updateData.date) {
-        updateData.date = new Date(updateData.date);
       }
 
       const updatedFillup = await this.fillupService.update(id, updateData);
@@ -123,7 +163,7 @@ export class FillupController {
         return;
       }
 
-      // Check if the car exists and belongs to the user
+      // Then check if the car exists and belongs to the user
       const car = await this.carService.findById(existingFillup.car_id);
       if (!car) {
         res.status(404).json({ message: 'Car not found' });

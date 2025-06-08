@@ -5,6 +5,9 @@ import { verifyToken } from '@middleware/auth.middleware';
 const router = Router();
 const fillupController = new FillupController();
 
+// Get fillups (optionally filtered by carId)
+router.get('/', verifyToken as RequestHandler, fillupController.getFillups);
+
 // Create a new fillup
 router.post('/', verifyToken as RequestHandler, fillupController.createFillup);
 

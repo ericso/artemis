@@ -60,7 +60,7 @@ describe('FillupController', () => {
         id: 'user-123',
         email: 'test@example.com'
       },
-      body: {},
+      query: {},
       params: {}
     };
 
@@ -75,6 +75,143 @@ describe('FillupController', () => {
 
   afterEach(() => {
     consoleErrorSpy.mockRestore();
+  });
+
+  describe('getFillups', () => {
+    const userCars: Car[] = [
+      {
+        id: 'car-1',
+        user_id: 'user-123',
+        make: 'Toyota',
+        model: 'Camry',
+        year: 2020,
+        vin: 'ABC123',
+        name: 'Car 1',
+        created_at: new Date(),
+        updated_at: null,
+        deleted_at: null
+      },
+      {
+        id: 'car-2',
+        user_id: 'user-123',
+        make: 'Honda',
+        model: 'Civic',
+        year: 2021,
+        vin: 'DEF456',
+        name: 'Car 2',
+        created_at: new Date(),
+        updated_at: null,
+        deleted_at: null
+      }
+    ];
+
+    const fillups: Fillup[] = [
+      {
+        id: 'fillup-1',
+        car_id: 'car-1',
+        date: new Date(),
+        gallons: 10,
+        total_cost: 30,
+        odometer_reading: 50000,
+        station_address: 'Station 1',
+        notes: 'Note 1',
+        created_at: new Date(),
+        updated_at: null,
+        deleted_at: null
+      },
+      {
+        id: 'fillup-2',
+        car_id: 'car-2',
+        date: new Date(),
+        gallons: 12,
+        total_cost: 36,
+        odometer_reading: 60000,
+        station_address: 'Station 2',
+        notes: 'Note 2',
+        created_at: new Date(),
+        updated_at: null,
+        deleted_at: null
+      }
+    ];
+
+    it('should return all fillups for all user cars when no carId is provided', async () => {
+      mockCarService.findByUserId.mockResolvedValue(userCars);
+      mockFillupService.findByCarId.mockImplementation(async (carId) => {
+        return fillups.filter(f => f.car_id === carId);
+      });
+
+      await fillupController.getFillups(mockRequest as AuthRequest, mockResponse as Response);
+
+      expect(mockCarService.findByUserId).toHaveBeenCalledWith('user-123');
+      expect(mockFillupService.findByCarId).toHaveBeenCalledTimes(2);
+      expect(mockResponse.json).toHaveBeenCalledWith(fillups);
+    });
+
+    it('should return fillups for a specific car when carId is provided', async () => {
+      mockRequest.query = { carId: 'car-1' };
+      mockCarService.findById.mockResolvedValue(userCars[0]);
+      mockFillupService.findByCarId.mockResolvedValue([fillups[0]]);
+
+      await fillupController.getFillups(mockRequest as AuthRequest, mockResponse as Response);
+
+      expect(mockCarService.findById).toHaveBeenCalledWith('car-1');
+      expect(mockFillupService.findByCarId).toHaveBeenCalledWith('car-1');
+      expect(mockResponse.json).toHaveBeenCalledWith([fillups[0]]);
+    });
+
+    it('should return 401 if user is not authenticated', async () => {
+      mockRequest.user = undefined;
+
+      await fillupController.getFillups(mockRequest as AuthRequest, mockResponse as Response);
+
+      expect(mockCarService.findByUserId).not.toHaveBeenCalled();
+      expect(mockFillupService.findByCarId).not.toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Unauthorized'
+      });
+    });
+
+    it('should return 404 if specified car is not found', async () => {
+      mockRequest.query = { carId: 'non-existent-car' };
+      mockCarService.findById.mockResolvedValue(undefined);
+
+      await fillupController.getFillups(mockRequest as AuthRequest, mockResponse as Response);
+
+      expect(mockFillupService.findByCarId).not.toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(404);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Car not found'
+      });
+    });
+
+    it('should return 403 if user does not own the specified car', async () => {
+      mockRequest.query = { carId: 'car-3' };
+      mockCarService.findById.mockResolvedValue({
+        ...userCars[0],
+        id: 'car-3',
+        user_id: 'different-user'
+      });
+
+      await fillupController.getFillups(mockRequest as AuthRequest, mockResponse as Response);
+
+      expect(mockFillupService.findByCarId).not.toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(403);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Forbidden'
+      });
+    });
+
+    it('should return 500 if an error occurs', async () => {
+      mockCarService.findByUserId.mockRejectedValue(new Error('Database error'));
+
+      await fillupController.getFillups(mockRequest as AuthRequest, mockResponse as Response);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(500);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Error fetching fillups'
+      });
+    });
   });
 
   describe('createFillup', () => {

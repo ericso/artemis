@@ -11,6 +11,23 @@ export class CarController {
     this.carService = new PostgresCarService();
   }
 
+  getCars = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const userId = req.user?.id;
+
+      if (!userId) {
+        res.status(401).json({ message: 'Unauthorized' });
+        return;
+      }
+
+      const cars = await this.carService.findByUserId(userId);
+      res.json(cars);
+    } catch (error) {
+      console.error('Error fetching cars:', error);
+      res.status(500).json({ message: 'Error fetching cars' });
+    }
+  };
+
   createCar = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const { make, model, year, vin, name } = req.body;

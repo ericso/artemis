@@ -32,8 +32,8 @@ describe('CarController', () => {
     } as unknown as jest.Mocked<PostgresCarService>;
 
     carController = new CarController();
-    // Replace the private carService with our mock
-    (carController as any).carService = mockCarService;
+    // Replace the private carService with our mock using type assertion
+    (carController as unknown as { carService: PostgresCarService }).carService = mockCarService;
 
     mockRequest = {
       user: {
@@ -48,7 +48,7 @@ describe('CarController', () => {
       json: jest.fn().mockReturnThis(),
       status: jest.fn().mockReturnThis(),
       send: jest.fn().mockReturnThis()
-    };
+    } as Partial<Response>;
 
     jest.clearAllMocks();
   });
@@ -58,7 +58,7 @@ describe('CarController', () => {
   });
 
   describe('createCar', () => {
-    const validCarData = {
+    const validCarData: Omit<Car, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'deleted_at'> = {
       make: 'Toyota',
       model: 'Camry',
       year: 2020,
@@ -72,8 +72,8 @@ describe('CarController', () => {
         ...validCarData,
         id: 'mock-uuid',
         user_id: 'user-123',
-        created_at: expect.any(Date),
-        updated_at: expect.any(Date),
+        created_at: new Date(),
+        updated_at: new Date(),
         deleted_at: null
       };
 
@@ -118,7 +118,7 @@ describe('CarController', () => {
 
   describe('updateCar', () => {
     const carId = 'car-123';
-    const updateData = {
+    const updateData: Partial<Car> = {
       name: 'Updated Car Name',
       year: 2021
     };
@@ -139,11 +139,12 @@ describe('CarController', () => {
       mockRequest.params = { id: carId };
       mockRequest.body = updateData;
       mockCarService.findById.mockResolvedValue(existingCar);
-      mockCarService.update.mockResolvedValue({
+      const updatedCar: Car = {
         ...existingCar,
         ...updateData,
         updated_at: new Date()
-      });
+      };
+      mockCarService.update.mockResolvedValue(updatedCar);
 
       await carController.updateCar(mockRequest as AuthRequest, mockResponse as Response);
 

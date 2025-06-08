@@ -1,43 +1,45 @@
+import React from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import Home from '../pages/Home';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
 import { useAuth } from '../stores/AuthContext';
+import GuestRoute from './GuestRoute';
 
 // Protected Route wrapper component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { token } = useAuth();
+
   if (!token) {
     return <Navigate to="/login" replace />;
   }
-  return children;
-};
 
-// Guest Route wrapper component (for login/register pages)
-const GuestRoute = ({ children }: { children: React.ReactNode }) => {
-  const { token } = useAuth();
-  if (token) {
-    return <Navigate to="/dashboard" replace />;
-  }
-  return children;
+  return <>{children}</>;
 };
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Home />
+    element: (
+      <ProtectedRoute>
+        <Dashboard />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/login',
-    element: <GuestRoute><Login /></GuestRoute>
+    element: (
+      <GuestRoute>
+        <Login />
+      </GuestRoute>
+    ),
   },
   {
     path: '/register',
-    element: <GuestRoute><Register /></GuestRoute>
+    element: (
+      <GuestRoute>
+        <Register />
+      </GuestRoute>
+    ),
   },
-  {
-    path: '/dashboard',
-    element: <ProtectedRoute><Dashboard /></ProtectedRoute>
-  }
 ]); 

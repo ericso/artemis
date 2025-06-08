@@ -1,39 +1,46 @@
+import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
 import { Response } from 'express';
 import { CarController } from '@controllers/car.controller';
 import { PostgresCarService } from '@services/postgres-car.service';
 import { Car } from '@models/car';
 import { AuthRequest } from '@middleware/auth.middleware';
-import { Pool } from 'pg';
 
 // Mock the uuid generation
-jest.mock('uuid', () => ({
-  v4: jest.fn(() => 'mock-uuid')
+vi.mock('uuid', () => ({
+  v4: vi.fn(() => 'mock-uuid')
 }));
+
+// Mock the car service
+vi.mock('../services/car.service');
 
 describe('CarController', () => {
   let mockRequest: Partial<AuthRequest>;
   let mockResponse: Partial<Response>;
-  let mockCarService: jest.Mocked<PostgresCarService>;
+  let mockCarService: {
+    create: Mock;
+    findById: Mock;
+    update: Mock;
+    findByUserId: Mock;
+    softDelete: Mock;
+  };
   let carController: CarController;
-  let consoleErrorSpy: jest.SpyInstance;
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     // Suppress console.error messages
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     mockCarService = {
-      findById: jest.fn(),
-      findByUserId: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      softDelete: jest.fn(),
-      db: {} as Pool,
-      mapRowToCar: jest.fn()
-    } as unknown as jest.Mocked<PostgresCarService>;
+      create: vi.fn(),
+      findById: vi.fn(),
+      update: vi.fn(),
+      findByUserId: vi.fn(),
+      softDelete: vi.fn(),
+    };
 
     carController = new CarController();
     // Replace the private carService with our mock using type assertion
-    (carController as unknown as { carService: PostgresCarService }).carService = mockCarService;
+    (carController as unknown as { carService: PostgresCarService }).carService = mockCarService as unknown as PostgresCarService;
 
     mockRequest = {
       user: {
@@ -45,12 +52,12 @@ describe('CarController', () => {
     };
 
     mockResponse = {
-      json: jest.fn().mockReturnThis(),
-      status: jest.fn().mockReturnThis(),
-      send: jest.fn().mockReturnThis()
+      json: vi.fn().mockReturnThis(),
+      status: vi.fn().mockReturnThis(),
+      send: vi.fn().mockReturnThis()
     } as Partial<Response>;
 
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
@@ -221,8 +228,8 @@ describe('CarController', () => {
 
     it('should successfully delete a car', async () => {
       mockRequest.params = { id: carId };
-      mockCarService.findById.mockResolvedValue(existingCar);
-      mockCarService.softDelete.mockResolvedValue();
+      (mockCarService.findById as any).mockResolvedValue(existingCar);
+      (mockCarService.softDelete as any).mockResolvedValue();
 
       await carController.deleteCar(mockRequest as AuthRequest, mockResponse as Response);
 
@@ -242,7 +249,7 @@ describe('CarController', () => {
 
     it('should return 404 if car does not exist', async () => {
       mockRequest.params = { id: carId };
-      mockCarService.findById.mockResolvedValue(undefined);
+      (mockCarService.findById as any).mockResolvedValue(undefined);
 
       await carController.deleteCar(mockRequest as AuthRequest, mockResponse as Response);
 
@@ -252,7 +259,7 @@ describe('CarController', () => {
 
     it('should return 403 if user does not own the car', async () => {
       mockRequest.params = { id: carId };
-      mockCarService.findById.mockResolvedValue({
+      (mockCarService.findById as any).mockResolvedValue({
         ...existingCar,
         user_id: 'different-user'
       });
@@ -265,8 +272,8 @@ describe('CarController', () => {
 
     it('should return 500 if deletion fails', async () => {
       mockRequest.params = { id: carId };
-      mockCarService.findById.mockResolvedValue(existingCar);
-      mockCarService.softDelete.mockRejectedValue(new Error('Database error'));
+      (mockCarService.findById as any).mockResolvedValue(existingCar);
+      (mockCarService.softDelete as any).mockRejectedValue(new Error('Database error'));
 
       await carController.deleteCar(mockRequest as AuthRequest, mockResponse as Response);
 

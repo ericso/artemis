@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/stores/AuthContext';
@@ -21,7 +21,16 @@ vi.mock('axios', () => {
   };
 });
 
-const mockAxios = axios as jest.Mocked<typeof axios> & { create: jest.Mock };
+type MockAxios = {
+  create: Mock;
+  post: Mock;
+  interceptors: {
+    request: { use: Mock };
+    response: { use: Mock };
+  };
+};
+
+const mockAxios = axios as unknown as MockAxios;
 
 // Mock useNavigate
 const mockNavigate = vi.fn();

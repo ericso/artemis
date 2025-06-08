@@ -1,18 +1,19 @@
 import { Pool, QueryResult } from 'pg';
 import { PostgresCarService } from '@services/postgres-car.service';
 import { Car } from '@models/car';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 describe('PostgresCarService', () => {
   let mockPool: { 
-    query: jest.Mock<Promise<QueryResult<Car>>>;
-    end: jest.Mock;
+    query: ReturnType<typeof vi.fn>;
+    end: ReturnType<typeof vi.fn>;
   };
   let carService: PostgresCarService;
 
   beforeEach(() => {
     mockPool = {
-      query: jest.fn(),
-      end: jest.fn(),
+      query: vi.fn(),
+      end: vi.fn(),
     };
 
     carService = new PostgresCarService(mockPool as unknown as Pool);
@@ -33,7 +34,7 @@ describe('PostgresCarService', () => {
 
   describe('findById', () => {
     it('should find existing car by id', async () => {
-      mockPool.query.mockResolvedValue({
+      (mockPool.query as any).mockResolvedValue({
         rows: [mockCar],
         rowCount: 1,
         command: '',
@@ -51,7 +52,7 @@ describe('PostgresCarService', () => {
     });
 
     it('should return undefined for non-existent car', async () => {
-      mockPool.query.mockResolvedValue({
+      (mockPool.query as any).mockResolvedValue({
         rows: [],
         rowCount: 0,
         command: '',
@@ -65,7 +66,7 @@ describe('PostgresCarService', () => {
     });
 
     it('should not find soft-deleted cars', async () => {
-      mockPool.query.mockResolvedValue({
+      (mockPool.query as any).mockResolvedValue({
         rows: [],
         rowCount: 0,
         command: '',

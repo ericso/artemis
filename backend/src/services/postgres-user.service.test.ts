@@ -1,18 +1,19 @@
 import { Pool, QueryResult } from 'pg';
 import { PostgresUserService } from '@services/postgres-user.service';
 import { User } from '@models/user';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 describe('PostgresUserService', () => {
   let mockPool: { 
-    query: jest.Mock<Promise<QueryResult<User>>>;
-    end: jest.Mock;
+    query: ReturnType<typeof vi.fn>;
+    end: ReturnType<typeof vi.fn>;
   };
   let userService: PostgresUserService;
 
   beforeEach(() => {
     mockPool = {
-      query: jest.fn(),
-      end: jest.fn(),
+      query: vi.fn(),
+      end: vi.fn(),
     };
 
     userService = new PostgresUserService(mockPool as unknown as Pool);
@@ -21,7 +22,7 @@ describe('PostgresUserService', () => {
   const mockUser: User = {
     id: '123e4567-e89b-12d3-a456-426614174000',
     email: 'test@example.com',
-    password: 'hashedPassword',
+    password: 'hashedPassword123',
     created_at: new Date('2024-01-01'),
     updated_at: null,
     deleted_at: null
@@ -33,7 +34,7 @@ describe('PostgresUserService', () => {
         ...mockUser,
         created_at: new Date('2024-01-01')
       };
-      mockPool.query.mockResolvedValue({
+      (mockPool.query as any).mockResolvedValue({
         rows: [mockCreatedUser],
         rowCount: 1,
         command: '',
@@ -53,7 +54,7 @@ describe('PostgresUserService', () => {
 
   describe('findByEmail', () => {
     it('should find existing user by email', async () => {
-      mockPool.query.mockResolvedValue({
+      (mockPool.query as any).mockResolvedValue({
         rows: [mockUser],
         rowCount: 1,
         command: '',
@@ -71,7 +72,7 @@ describe('PostgresUserService', () => {
     });
 
     it('should return undefined for non-existent user', async () => {
-      mockPool.query.mockResolvedValue({
+      (mockPool.query as any).mockResolvedValue({
         rows: [],
         rowCount: 0,
         command: '',
@@ -86,7 +87,7 @@ describe('PostgresUserService', () => {
 
     it('should not find soft-deleted users', async () => {
       const deletedUser = { ...mockUser, deleted_at: new Date() };
-      mockPool.query.mockResolvedValue({
+      (mockPool.query as any).mockResolvedValue({
         rows: [],
         rowCount: 0,
         command: '',

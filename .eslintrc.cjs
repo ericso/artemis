@@ -2,8 +2,7 @@ module.exports = {
   root: true,
   env: {
     es2021: true,
-    node: true,
-    'jest': true
+    node: true
   },
   extends: [
     'eslint:recommended',
@@ -65,6 +64,17 @@ module.exports = {
       },
       rules: {
         // Add any backend-specific rules here
+      }
+    },
+    // Test files configuration
+    {
+      files: ['**/*.{test,spec}.{ts,tsx}'],
+      env: {
+        'vitest-globals/env': true
+      },
+      extends: ['plugin:vitest-globals/recommended'],
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'off'
       }
     }
   ]

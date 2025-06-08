@@ -3,12 +3,13 @@ import { AuthController, AuthRequestBody, AuthResponse } from '@controllers/auth
 import { UserService } from '@services/user.service';
 import { hashPassword, comparePassword, generateToken } from '@utils/auth.utils';
 import { User } from '@models/user';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock the utils
-jest.mock('@utils/auth.utils', () => ({
-  hashPassword: jest.fn(),
-  comparePassword: jest.fn(),
-  generateToken: jest.fn()
+vi.mock('@utils/auth.utils', () => ({
+  hashPassword: vi.fn(),
+  comparePassword: vi.fn(),
+  generateToken: vi.fn()
 }));
 
 type AuthRequest = Request<Record<string, never>, AuthResponse, AuthRequestBody>;
@@ -16,15 +17,15 @@ type AuthRequest = Request<Record<string, never>, AuthResponse, AuthRequestBody>
 describe('AuthController', () => {
   let mockRequest: Partial<AuthRequest>;
   let mockResponse: Partial<Response<AuthResponse>>;
-  let mockUserService: jest.Mocked<UserService>;
+  let mockUserService: UserService;
   let authController: AuthController;
 
   beforeEach(() => {
     mockUserService = {
-      findByEmail: jest.fn(),
-      create: jest.fn(),
-      softDelete: jest.fn()
-    };
+      findByEmail: vi.fn(),
+      create: vi.fn(),
+      softDelete: vi.fn()
+    } as unknown as UserService;
 
     authController = new AuthController(mockUserService);
 
@@ -33,11 +34,11 @@ describe('AuthController', () => {
     };
     
     mockResponse = {
-      json: jest.fn().mockReturnThis(),
-      status: jest.fn().mockReturnThis()
+      json: vi.fn().mockReturnThis(),
+      status: vi.fn().mockReturnThis()
     };
 
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('register', () => {
@@ -48,15 +49,15 @@ describe('AuthController', () => {
 
     it('should successfully register a new user', async () => {
       mockRequest.body = validRegistrationData;
-      mockUserService.findByEmail.mockResolvedValue(undefined);
-      mockUserService.create.mockImplementation(user => Promise.resolve({
+      (mockUserService.findByEmail as any).mockResolvedValue(undefined);
+      (mockUserService.create as any).mockImplementation((user: Partial<User>) => Promise.resolve({
         ...user,
         created_at: new Date(),
         updated_at: undefined,
         deleted_at: undefined
       }));
-      (hashPassword as jest.Mock).mockResolvedValue('hashedPassword');
-      (generateToken as jest.Mock).mockReturnValue('mockToken');
+      (hashPassword as any).mockResolvedValue('hashedPassword');
+      (generateToken as any).mockReturnValue('mockToken');
 
       await authController.register(mockRequest as AuthRequest, mockResponse as Response);
 
@@ -70,7 +71,7 @@ describe('AuthController', () => {
 
     it('should return 400 if user already exists', async () => {
       mockRequest.body = validRegistrationData;
-      mockUserService.findByEmail.mockResolvedValue({
+      (mockUserService.findByEmail as any).mockResolvedValue({
         id: '1',
         email: validRegistrationData.email,
         password: 'hashedPassword',
@@ -87,8 +88,8 @@ describe('AuthController', () => {
 
     it('should return 500 if registration fails', async () => {
       mockRequest.body = validRegistrationData;
-      mockUserService.findByEmail.mockResolvedValue(undefined);
-      (hashPassword as jest.Mock).mockRejectedValue(new Error('Hash failed'));
+      (mockUserService.findByEmail as any).mockResolvedValue(undefined);
+      (hashPassword as any).mockRejectedValue(new Error('Hash failed'));
 
       await authController.register(mockRequest as AuthRequest, mockResponse as Response);
 
@@ -112,9 +113,9 @@ describe('AuthController', () => {
         email: validUser.email,
         password: 'password123'
       };
-      mockUserService.findByEmail.mockResolvedValue(validUser);
-      (comparePassword as jest.Mock).mockResolvedValue(true);
-      (generateToken as jest.Mock).mockReturnValue('loginToken');
+      (mockUserService.findByEmail as any).mockResolvedValue(validUser);
+      (comparePassword as any).mockResolvedValue(true);
+      (generateToken as any).mockReturnValue('loginToken');
 
       await authController.login(mockRequest as AuthRequest, mockResponse as Response);
 
@@ -134,7 +135,7 @@ describe('AuthController', () => {
         email: 'nonexistent@example.com',
         password: 'password123'
       };
-      mockUserService.findByEmail.mockResolvedValue(undefined);
+      (mockUserService.findByEmail as any).mockResolvedValue(undefined);
 
       await authController.login(mockRequest as AuthRequest, mockResponse as Response);
 
@@ -150,7 +151,7 @@ describe('AuthController', () => {
         password: 'password123'
       };
       // findByEmail will return undefined for soft-deleted users
-      mockUserService.findByEmail.mockResolvedValue(undefined);
+      (mockUserService.findByEmail as any).mockResolvedValue(undefined);
 
       await authController.login(mockRequest as AuthRequest, mockResponse as Response);
 
@@ -165,8 +166,8 @@ describe('AuthController', () => {
         email: validUser.email,
         password: 'wrongpassword'
       };
-      mockUserService.findByEmail.mockResolvedValue(validUser);
-      (comparePassword as jest.Mock).mockResolvedValue(false);
+      (mockUserService.findByEmail as any).mockResolvedValue(validUser);
+      (comparePassword as any).mockResolvedValue(false);
 
       await authController.login(mockRequest as AuthRequest, mockResponse as Response);
 
@@ -181,7 +182,7 @@ describe('AuthController', () => {
         email: validUser.email,
         password: validUser.password
       };
-      mockUserService.findByEmail.mockRejectedValue(new Error('Database error'));
+      (mockUserService.findByEmail as any).mockRejectedValue(new Error('Database error'));
 
       await authController.login(mockRequest as AuthRequest, mockResponse as Response);
 

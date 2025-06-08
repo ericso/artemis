@@ -28,25 +28,17 @@ export const CarsPage: React.FC = () => {
   }, []);
 
   const handleCreateCar = async (carData: CreateCarDto) => {
-    try {
-      await CarService.createCar(carData);
-      await loadCars();
-      setShowForm(false);
-    } catch (err) {
-      throw err;
-    }
+    await CarService.createCar(carData);
+    await loadCars();
+    setShowForm(false);
   };
 
   const handleUpdateCar = async (carData: CreateCarDto) => {
     if (!selectedCar) return;
-    try {
-      await CarService.updateCar(selectedCar.id, carData);
-      await loadCars();
-      setShowForm(false);
-      setSelectedCar(undefined);
-    } catch (err) {
-      throw err;
-    }
+    await CarService.updateCar(selectedCar.id, carData);
+    await loadCars();
+    setShowForm(false);
+    setSelectedCar(undefined);
   };
 
   const handleDeleteCar = async (car: Car) => {

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from '../../stores/AuthContext';
-import Login from '../Login';
+import { AuthProvider } from '@/stores/AuthContext';
+import Login from '@/pages/Login';
 import axios from 'axios';
 
 // Mock axios

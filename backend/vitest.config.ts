@@ -25,6 +25,8 @@ export default defineConfig({
       '@utils': resolve(__dirname, './src/utils'),
       '@config': resolve(__dirname, './src/config'),
       '@db': resolve(__dirname, './src/db')
-    }
+    },
+    silent: true,
+    onConsoleLog: () => false
   }
 }); 

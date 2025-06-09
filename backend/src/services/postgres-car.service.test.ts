@@ -26,6 +26,7 @@ describe('PostgresCarService', () => {
     year: 2024,
     vin: 'ABC123XYZ',
     name: 'My Car',
+    initial_mileage: 50000,
     user_id: '987fcdeb-51a2-43f7-9abc-def012345678',
     created_at: new Date('2024-01-01'),
     updated_at: null,
@@ -137,7 +138,7 @@ describe('PostgresCarService', () => {
 
       expect(mockPool.query).toHaveBeenCalledWith(
         expect.stringContaining('INSERT INTO cars'),
-        [mockCar.id, mockCar.make, mockCar.model, mockCar.year, mockCar.vin, mockCar.name, mockCar.user_id]
+        [mockCar.id, mockCar.make, mockCar.model, mockCar.year, mockCar.vin, mockCar.name, mockCar.initial_mileage, mockCar.user_id]
       );
       expect(result).toEqual(mockCreatedCar);
     });

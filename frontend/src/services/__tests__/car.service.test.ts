@@ -20,6 +20,7 @@ describe('CarService', () => {
     year: 2020,
     vin: 'ABC123',
     name: 'Daily Driver',
+    initial_mileage: 50000,
     user_id: 'user1',
     created_at: new Date('2024-01-01'),
     updated_at: new Date('2024-01-02'),
@@ -31,7 +32,8 @@ describe('CarService', () => {
     model: 'Camry',
     year: 2020,
     vin: 'ABC123',
-    name: 'Daily Driver'
+    name: 'Daily Driver',
+    initial_mileage: 50000
   };
 
   beforeEach(() => {

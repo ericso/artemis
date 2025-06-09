@@ -10,8 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "migrate": "ts-node -r tsconfig-paths/register src/app.ts migrate",
-    "migrate:down": "ts-node -r tsconfig-paths/register src/app.ts migrate down",
+    "migrate": "ts-node -r tsconfig-paths/register src/db/migrate.ts",
+    "migrate:down": "ts-node -r tsconfig-paths/register src/db/migrate.ts down",
     "type-check": "tsc --noEmit",
     "lint": "eslint --fix \"src/**/*.ts\""
   },

@@ -10,6 +10,7 @@ interface CarRow {
   year: number;
   vin: string;
   name: string;
+  initial_mileage: number;
   user_id: string;
   created_at: Date;
   updated_at: Date;
@@ -39,12 +40,12 @@ export class PostgresCarService implements CarService {
 
   async create(car: Car): Promise<Car> {
     const query = `
-      INSERT INTO cars (id, make, model, year, vin, name, user_id)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO cars (id, make, model, year, vin, name, initial_mileage, user_id)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *
     `;
     
-    const values = [car.id, car.make, car.model, car.year, car.vin, car.name, car.user_id];
+    const values = [car.id, car.make, car.model, car.year, car.vin, car.name, car.initial_mileage, car.user_id];
     const result = await this.db.query(query, values);
 
     return this.mapRowToCar(result.rows[0]);
@@ -76,6 +77,10 @@ export class PostgresCarService implements CarService {
     if (car.name !== undefined) {
       updates.push(`name = $${paramCount++}`);
       values.push(car.name);
+    }
+    if (car.initial_mileage !== undefined) {
+      updates.push(`initial_mileage = $${paramCount++}`);
+      values.push(car.initial_mileage);
     }
 
     // If no fields to update, return early
@@ -122,6 +127,7 @@ export class PostgresCarService implements CarService {
       year: row.year,
       vin: row.vin,
       name: row.name,
+      initial_mileage: row.initial_mileage,
       user_id: row.user_id,
       created_at: row.created_at,
       updated_at: row.updated_at,

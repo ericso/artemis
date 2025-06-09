@@ -2,6 +2,7 @@ import { pool } from '@config/database';
 import * as createUsersTable from './migrations/001_create_users_table';
 import * as createCarsTable from './migrations/002_create_cars_table';
 import * as createFillupsTable from './migrations/003_create_fillups_table';
+import * as addInitialMileageToCars from './migrations/004_add_initial_mileage_to_cars';
 
 async function migrate(direction: 'up' | 'down' = 'up') {
   try {
@@ -9,8 +10,10 @@ async function migrate(direction: 'up' | 'down' = 'up') {
       await createUsersTable.up();
       await createCarsTable.up();
       await createFillupsTable.up();
+      await addInitialMileageToCars.up();
       console.log('Migrations completed successfully');
     } else {
+      await addInitialMileageToCars.down();
       await createFillupsTable.down();
       await createCarsTable.down();
       await createUsersTable.down();

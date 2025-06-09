@@ -30,10 +30,6 @@
   .app {
     @apply h-full w-full;
   }
-  
-  .home {
-    @apply flex min-h-[80vh] flex-col items-center justify-center;
-  }
 }
 
 :root {

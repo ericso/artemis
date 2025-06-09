@@ -30,17 +30,70 @@
   .app {
     @apply h-full w-full;
   }
+
+  .auth-container {
+    @apply min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8;
+  }
+
+  .auth-box {
+    @apply max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md;
+  }
+
+  .auth-header {
+    @apply text-center;
+  }
+
+  .auth-header h1 {
+    @apply mt-6 text-3xl font-extrabold text-gray-900;
+  }
+
+  .auth-form {
+    @apply mt-8 space-y-6;
+  }
+
+  .form-group {
+    @apply -space-y-px rounded-md;
+  }
+
+  .form-group label {
+    @apply sr-only;
+  }
+
+  .form-group input {
+    @apply appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm;
+  }
+
+  .form-group input:first-child {
+    @apply rounded-t-md;
+  }
+
+  .form-group input:last-child {
+    @apply rounded-b-md;
+  }
+
+  .auth-button {
+    @apply relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed;
+  }
+
+  .auth-link {
+    @apply text-center mt-4;
+  }
+
+  .auth-link a {
+    @apply font-medium text-blue-600 hover:text-blue-500;
+  }
+
+  .error {
+    @apply mt-2 text-sm text-red-600 bg-red-50 p-2 rounded-md;
+  }
 }
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  color: #213547;
+  background-color: #ffffff;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

@@ -4,6 +4,7 @@ import * as createCarsTable from './migrations/002_create_cars_table';
 import * as createFillupsTable from './migrations/003_create_fillups_table';
 import * as addInitialMileageToCars from './migrations/004_add_initial_mileage_to_cars';
 import * as addSoftDeleteTriggers from './migrations/005_add_soft_delete_triggers';
+import readline from 'readline';
 
 interface Migration {
   name: string;
@@ -52,7 +53,36 @@ async function removeMigration(name: string): Promise<void> {
   }
 }
 
+async function confirmRollback(): Promise<boolean> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  console.log('\n⚠️  WARNING: You are about to roll back all migrations!');
+  console.log('This will:');
+  console.log('1. Drop all tables');
+  console.log('2. Delete all data');
+  console.log('3. Drop the migrations table');
+  console.log('\nThis action cannot be undone!\n');
+
+  return new Promise((resolve) => {
+    rl.question('Are you sure you want to proceed? Type "MIGRATE-DOWN" to confirm: ', (answer) => {
+      rl.close();
+      resolve(answer === 'MIGRATE-DOWN');
+    });
+  });
+}
+
 async function migrate(direction: 'up' | 'down' = 'up') {
+  if (direction === 'down') {
+    const confirmed = await confirmRollback();
+    if (!confirmed) {
+      console.log('Down-migration cancelled.');
+      process.exit(0);
+    }
+  }
+
   const client = await pool.connect();
   
   try {

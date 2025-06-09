@@ -20,10 +20,11 @@ export function FillupForm({ carId, fillup, onSuccess, onCancel }: FillupFormPro
   });
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [initialData, setInitialData] = useState<CreateFillupDto | null>(null);
 
   useEffect(() => {
     if (fillup) {
-      setFormData({
+      const data = {
         car_id: fillup.car_id,
         date: new Date(fillup.date),
         gallons: fillup.gallons,
@@ -31,7 +32,9 @@ export function FillupForm({ carId, fillup, onSuccess, onCancel }: FillupFormPro
         odometer_reading: fillup.odometer_reading,
         station_address: fillup.station_address || '',
         notes: fillup.notes || '',
-      });
+      };
+      setFormData(data);
+      setInitialData(data);
     }
   }, [fillup]);
 
@@ -52,16 +55,41 @@ export function FillupForm({ carId, fillup, onSuccess, onCancel }: FillupFormPro
     setIsSubmitting(true);
 
     try {
-      const submissionData = {
-        ...formData,
-        gallons: Number(formData.gallons.toFixed(3)),
-        total_cost: Number(formData.total_cost.toFixed(2))
-      };
+      // Create submission data with only changed fields
+      const submissionData: Partial<CreateFillupDto> = {};
+      
+      // Always include car_id
+      submissionData.car_id = formData.car_id;
+
+      // Compare with initial data and only include changed fields
+      if (!initialData || formData.date.getTime() !== initialData.date.getTime()) {
+        submissionData.date = formData.date;
+      }
+      
+      if (!initialData || formData.gallons !== initialData.gallons) {
+        submissionData.gallons = Number(formData.gallons.toFixed(3));
+      }
+      
+      if (!initialData || formData.total_cost !== initialData.total_cost) {
+        submissionData.total_cost = Number(formData.total_cost.toFixed(2));
+      }
+      
+      if (!initialData || formData.odometer_reading !== initialData.odometer_reading) {
+        submissionData.odometer_reading = formData.odometer_reading;
+      }
+      
+      if (!initialData || formData.station_address !== initialData.station_address) {
+        submissionData.station_address = formData.station_address;
+      }
+      
+      if (!initialData || formData.notes !== initialData.notes) {
+        submissionData.notes = formData.notes;
+      }
 
       if (fillup) {
         await FillupService.updateFillup(fillup.id, submissionData);
       } else {
-        await FillupService.createFillup(submissionData);
+        await FillupService.createFillup(formData as CreateFillupDto);
       }
       onSuccess();
     } catch (err) {

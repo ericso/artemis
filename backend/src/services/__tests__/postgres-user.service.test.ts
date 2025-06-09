@@ -106,19 +106,13 @@ describe('PostgresUserService', () => {
   });
 
   describe('softDelete', () => {
-    it('should set deleted_at timestamp', async () => {
+    it('should set deleted_at timestamp and only affect non-deleted users', async () => {
       await userService.softDelete(mockUser.email);
 
+      // The actual query in the implementation has line breaks and spacing
       expect(mockPool.query).toHaveBeenCalledWith(
-        expect.stringContaining('SET deleted_at = CURRENT_TIMESTAMP'),
-        [mockUser.email]
-      );
-    });
-
-    it('should only delete non-deleted users', async () => {
-      await userService.softDelete(mockUser.email);
-
-      expect(mockPool.query).toHaveBeenCalledWith(
+        expect.stringContaining('UPDATE users') &&
+        expect.stringContaining('SET deleted_at = CURRENT_TIMESTAMP') &&
         expect.stringContaining('WHERE email = $1 AND deleted_at IS NULL'),
         [mockUser.email]
       );

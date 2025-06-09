@@ -91,8 +91,23 @@ describe('CarsPage', () => {
 
     const carElement = screen.getAllByText(/Daily Driver/)[0];
     fireEvent.click(carElement);
-    expect(carElement.parentElement).toHaveStyle({
-      backgroundColor: '#eff6ff'
+    
+    // Wait for and verify the selection state
+    await waitFor(() => {
+      // Check that the car details are displayed
+      expect(screen.getByRole('heading', { level: 2, name: 'Daily Driver' })).toBeInTheDocument();
+      expect(screen.getByText('Detailed information about your vehicle')).toBeInTheDocument();
+      
+      // Check that the car element has the selection classes
+      expect(carElement.parentElement).toHaveClass('bg-blue-50');
+      
+      // Verify the car details are shown
+      expect(screen.getByText('Make')).toBeInTheDocument();
+      expect(screen.getByText('Toyota')).toBeInTheDocument();
+      expect(screen.getByText('Model')).toBeInTheDocument();
+      expect(screen.getByText('Camry')).toBeInTheDocument();
+      expect(screen.getByText('Year')).toBeInTheDocument();
+      expect(screen.getByText('2020')).toBeInTheDocument();
     });
   });
 

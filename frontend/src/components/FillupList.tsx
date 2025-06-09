@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Fillup, FillupService } from '@/services/fillup.service';
 import { formatDate, formatCurrency, formatNumber } from '@/lib/utils';
 
@@ -13,11 +13,7 @@ export function FillupList({ carId, onEdit, onDelete }: FillupListProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadFillups();
-  }, [carId]);
-
-  const loadFillups = async () => {
+  const loadFillups = useCallback(async () => {
     try {
       setLoading(true);
       const data = await FillupService.getFillups(carId);
@@ -29,7 +25,11 @@ export function FillupList({ carId, onEdit, onDelete }: FillupListProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [carId]);
+
+  useEffect(() => {
+    loadFillups();
+  }, [loadFillups]);
 
   const handleDelete = async (fillup: Fillup) => {
     if (window.confirm('Are you sure you want to delete this fillup?')) {

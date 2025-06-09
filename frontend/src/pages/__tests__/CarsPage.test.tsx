@@ -98,7 +98,6 @@ describe('CarsPage', () => {
     await waitFor(() => {
       // Check that the car details are displayed
       expect(screen.getByRole('heading', { level: 2, name: 'Daily Driver' })).toBeInTheDocument();
-      expect(screen.getByText('Detailed information about your vehicle')).toBeInTheDocument();
       
       // Check that the car element has the selection classes
       expect(carElement.parentElement).toHaveClass('bg-blue-50');

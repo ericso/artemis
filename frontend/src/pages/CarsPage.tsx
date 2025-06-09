@@ -196,7 +196,7 @@ export const CarsPage: React.FC = () => {
                   {selectedCar.name || `${selectedCar.year} ${selectedCar.make} ${selectedCar.model}`}
                 </h2>
                 <p className="mt-1 text-sm text-gray-500">
-                  Detailed information about your vehicle
+                  {selectedCar.make} {selectedCar.model} • {selectedCar.year}
                 </p>
               </div>
               <div className="flex gap-2">

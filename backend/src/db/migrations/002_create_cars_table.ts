@@ -24,5 +24,5 @@ export async function up(db: Pool = pool): Promise<void> {
 }
 
 export async function down(db: Pool = pool): Promise<void> {
-  await db.query('DROP TABLE IF EXISTS cars');
+  await db.query('DROP TABLE IF EXISTS cars CASCADE');
 } 

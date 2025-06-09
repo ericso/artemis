@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '../test/test-utils';
-import { CarsPage } from './CarsPage';
+import { render, screen, fireEvent, waitFor } from '@/test/test-utils';
+import { CarsPage } from '@/pages/CarsPage';
 import { Car, CarService } from '@/services/car.service';
 import { Mock } from 'vitest';
 

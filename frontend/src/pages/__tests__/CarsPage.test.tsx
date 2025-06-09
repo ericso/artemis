@@ -23,6 +23,7 @@ describe('CarsPage', () => {
       year: 2020,
       name: 'Daily Driver',
       vin: 'ABC123',
+      initial_mileage: 50000,
       user_id: 'user1',
       created_at: new Date(),
       updated_at: null,
@@ -35,6 +36,7 @@ describe('CarsPage', () => {
       year: 2019,
       name: null,
       vin: 'DEF456',
+      initial_mileage: 75000,
       user_id: 'user1',
       created_at: new Date(),
       updated_at: null,
@@ -129,7 +131,8 @@ describe('CarsPage', () => {
       make: 'Tesla',
       model: 'Model 3',
       year: 2023,
-      name: 'Electric Dream'
+      name: 'Electric Dream',
+      initial_mileage: 0
     };
 
     (CarService.getCars as Mock).mockResolvedValue(mockCars);
@@ -199,7 +202,8 @@ describe('CarsPage', () => {
         model: mockCars[0].model,
         year: mockCars[0].year,
         vin: mockCars[0].vin,
-        name: updatedCar.name
+        name: updatedCar.name,
+        initial_mileage: mockCars[0].initial_mileage
       });
       expect(CarService.getCars).toHaveBeenCalledTimes(2); // Initial load + after update
     });

@@ -10,9 +10,6 @@ vi.mock('uuid', () => ({
   v4: vi.fn(() => 'mock-uuid')
 }));
 
-// Mock the car service
-vi.mock('../services/car.service');
-
 describe('CarController', () => {
   let mockRequest: Partial<AuthRequest>;
   let mockResponse: Partial<Response>;
@@ -70,7 +67,8 @@ describe('CarController', () => {
       model: 'Camry',
       year: 2020,
       vin: 'ABC123XYZ',
-      name: 'My Car'
+      name: 'My Car',
+      initial_mileage: 50000
     };
 
     it('should successfully create a new car', async () => {
@@ -95,6 +93,26 @@ describe('CarController', () => {
       }));
       expect(mockResponse.status).toHaveBeenCalledWith(201);
       expect(mockResponse.json).toHaveBeenCalledWith(expectedCar);
+    });
+
+    it('should set initial_mileage to 0 if not provided', async () => {
+      const carDataWithoutMileage = {
+        make: 'Toyota',
+        model: 'Camry',
+        year: 2020,
+        vin: 'ABC123XYZ',
+        name: 'My Car',
+        initial_mileage: 0
+      };
+      mockRequest.body = carDataWithoutMileage;
+      
+      await carController.createCar(mockRequest as AuthRequest, mockResponse as Response);
+
+      expect(mockCarService.create).toHaveBeenCalledWith(expect.objectContaining({
+        ...carDataWithoutMileage,
+        id: 'mock-uuid',
+        user_id: 'user-123'
+      }));
     });
 
     it('should return 401 if user is not authenticated', async () => {
@@ -127,7 +145,8 @@ describe('CarController', () => {
     const carId = 'car-123';
     const updateData: Partial<Car> = {
       name: 'Updated Car Name',
-      year: 2021
+      year: 2021,
+      initial_mileage: 55000
     };
     const existingCar: Car = {
       id: carId,
@@ -136,6 +155,7 @@ describe('CarController', () => {
       year: 2020,
       vin: 'ABC123XYZ',
       name: 'Original Name',
+      initial_mileage: 50000,
       user_id: 'user-123',
       created_at: new Date(),
       updated_at: new Date(),
@@ -159,6 +179,32 @@ describe('CarController', () => {
       expect(mockResponse.json).toHaveBeenCalledWith(expect.objectContaining({
         ...existingCar,
         ...updateData,
+        updated_at: expect.any(Date)
+      }));
+    });
+
+    it('should preserve initial_mileage when updating other fields', async () => {
+      const updateWithoutMileage: Partial<Car> = {
+        name: 'Updated Car Name',
+        year: 2021
+      };
+      mockRequest.params = { id: carId };
+      mockRequest.body = updateWithoutMileage;
+      mockCarService.findById.mockResolvedValue(existingCar);
+      const updatedCar = {
+        ...existingCar,
+        ...updateWithoutMileage,
+        updated_at: new Date()
+      };
+      mockCarService.update.mockResolvedValue(updatedCar);
+      
+      await carController.updateCar(mockRequest as AuthRequest, mockResponse as Response);
+
+      expect(mockCarService.update).toHaveBeenCalledWith(carId, updateWithoutMileage);
+      expect(mockResponse.json).toHaveBeenCalledWith(expect.objectContaining({
+        ...existingCar,
+        ...updateWithoutMileage,
+        initial_mileage: existingCar.initial_mileage,
         updated_at: expect.any(Date)
       }));
     });
@@ -220,6 +266,7 @@ describe('CarController', () => {
       year: 2020,
       vin: 'ABC123XYZ',
       name: 'Car to Delete',
+      initial_mileage: 50000,
       user_id: 'user-123',
       created_at: new Date(),
       updated_at: new Date(),

@@ -30,7 +30,7 @@ export class CarController {
 
   createCar = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-      const { make, model, year, vin, name } = req.body;
+      const { make, model, year, vin, name, initial_mileage } = req.body;
       const userId = req.user?.id;
 
       if (!userId) {
@@ -45,6 +45,7 @@ export class CarController {
         year,
         vin,
         name,
+        initial_mileage: initial_mileage || 0,
         user_id: userId,
         created_at: new Date(),
         updated_at: new Date(),

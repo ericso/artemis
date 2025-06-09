@@ -19,6 +19,7 @@ export const CarCard: React.FC<CarCardProps> = ({ car, onEdit, onDelete }) => {
             <p>Make: {car.make}</p>
             <p>Model: {car.model}</p>
             <p>Year: {car.year}</p>
+            <p>Initial Mileage: {car.initial_mileage.toLocaleString()} miles</p>
             {car.vin && <p>VIN: {car.vin}</p>}
           </div>
         </div>

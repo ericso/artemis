@@ -235,6 +235,10 @@ export const CarsPage: React.FC = () => {
                   <dt className="text-sm font-medium text-gray-500">Year</dt>
                   <dd className="mt-1 text-base font-medium text-gray-900">{selectedCar.year}</dd>
                 </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Initial Mileage</dt>
+                  <dd className="mt-1 text-base font-medium text-gray-900">{selectedCar.initial_mileage.toLocaleString()} miles</dd>
+                </div>
                 {selectedCar.vin && (
                   <div>
                     <dt className="text-sm font-medium text-gray-500">VIN</dt>

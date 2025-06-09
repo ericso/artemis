@@ -7,6 +7,7 @@ export interface Car {
   year: number;
   name: string | null;
   vin: string;
+  initial_mileage: number;
   user_id: string;
   created_at: Date;
   updated_at: Date;
@@ -19,6 +20,7 @@ export interface CreateCarDto {
   year: number;
   name?: string;
   vin?: string;
+  initial_mileage: number;
 }
 
 export const CarService = {

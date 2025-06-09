@@ -13,7 +13,8 @@ export const CarForm: React.FC<CarFormProps> = ({ car, onSubmit, onCancel }) => 
     model: '',
     year: new Date().getFullYear(),
     vin: '',
-    name: ''
+    name: '',
+    initial_mileage: 0
   });
   const [error, setError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,7 +26,8 @@ export const CarForm: React.FC<CarFormProps> = ({ car, onSubmit, onCancel }) => 
         model: car.model,
         year: car.year,
         vin: car.vin || '',
-        name: car.name || ''
+        name: car.name || '',
+        initial_mileage: car.initial_mileage
       });
     }
   }, [car]);
@@ -34,7 +36,7 @@ export const CarForm: React.FC<CarFormProps> = ({ car, onSubmit, onCancel }) => 
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'year' ? parseInt(value) || 0 : value
+      [name]: name === 'year' ? parseInt(value) || 0 : name === 'initial_mileage' ? parseInt(value) || 0 : value
     }));
   };
 
@@ -48,6 +50,7 @@ export const CarForm: React.FC<CarFormProps> = ({ car, onSubmit, onCancel }) => 
         make: formData.make,
         model: formData.model,
         year: formData.year,
+        initial_mileage: formData.initial_mileage,
         ...(formData.vin && { vin: formData.vin }),
         ...(formData.name && { name: formData.name })
       };
@@ -106,6 +109,22 @@ export const CarForm: React.FC<CarFormProps> = ({ car, onSubmit, onCancel }) => 
             required
             min="1900"
             max={new Date().getFullYear() + 1}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="initial_mileage" className="block text-sm font-medium text-gray-700">
+            Initial Mileage *
+          </label>
+          <input
+            type="number"
+            id="initial_mileage"
+            name="initial_mileage"
+            value={formData.initial_mileage}
+            onChange={handleChange}
+            required
+            min="0"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           />
         </div>

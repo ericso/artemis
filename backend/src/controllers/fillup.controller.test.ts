@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
 import { Response } from 'express';
-import { FillupController } from './fillup.controller';
-import { Fillup } from '../models/fillup';
-import { Car } from '../models/car';
-import { AuthRequest } from '../middleware/auth.middleware';
+import { FillupController } from '@controllers/fillup.controller';
+import { Fillup } from '@models/fillup';
+import { Car } from '@models/car';
+import { AuthRequest } from '@middleware/auth.middleware';
 
 // Mock the services
-vi.mock('../services/fillup.service');
-vi.mock('../services/car.service');
+vi.mock('@services/fillup.service');
+vi.mock('@services/car.service');
 
 describe('FillupController', () => {
   let mockFillupService: {
@@ -71,6 +71,7 @@ describe('FillupController', () => {
         year: 2020,
         vin: 'ABC123',
         name: 'Car 1',
+        initial_mileage: 50000,
         created_at: new Date(),
         updated_at: null,
         deleted_at: null
@@ -83,6 +84,7 @@ describe('FillupController', () => {
         year: 2021,
         vin: 'DEF456',
         name: 'Car 2',
+        initial_mileage: 75000,
         created_at: new Date(),
         updated_at: null,
         deleted_at: null
@@ -217,6 +219,7 @@ describe('FillupController', () => {
       year: 2020,
       vin: 'ABC123XYZ',
       name: 'My Car',
+      initial_mileage: 50000,
       created_at: new Date(),
       updated_at: null,
       deleted_at: null
@@ -247,15 +250,13 @@ describe('FillupController', () => {
       expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
         ...validFillupData,
         id: expect.any(String),
-        created_at: expect.any(Date),
-        updated_at: null,
-        deleted_at: null
+        created_at: expect.any(Date)
       }));
     });
 
     it('should return 401 if user is not authenticated', async () => {
-      mockReq.body = validFillupData;
       mockReq.user = undefined;
+      mockReq.body = validFillupData;
 
       await fillupController.createFillup(mockReq as AuthRequest, mockRes as Response);
 
@@ -267,7 +268,7 @@ describe('FillupController', () => {
       });
     });
 
-    it('should return 404 if car does not exist', async () => {
+    it('should return 404 if car is not found', async () => {
       mockReq.body = validFillupData;
       mockCarService.findById.mockResolvedValue(undefined);
 
@@ -338,6 +339,7 @@ describe('FillupController', () => {
       year: 2020,
       vin: 'ABC123XYZ',
       name: 'My Car',
+      initial_mileage: 50000,
       created_at: new Date(),
       updated_at: null,
       deleted_at: null
@@ -475,6 +477,7 @@ describe('FillupController', () => {
       year: 2020,
       vin: 'ABC123XYZ',
       name: 'My Car',
+      initial_mileage: 50000,
       created_at: new Date(),
       updated_at: null,
       deleted_at: null

@@ -1,4 +1,4 @@
-import { Request, Response, RequestHandler } from 'express';
+import { RequestHandler } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { hashPassword, comparePassword, generateToken } from '@utils/auth.utils';
 import { UserService } from '@services/user.service';

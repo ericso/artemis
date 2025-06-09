@@ -17,45 +17,51 @@ function Login() {
   };
 
   return (
-    <div className="login">
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit} className="login-form">
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            placeholder="Enter your email"
-            disabled={loading}
-          />
+    <div className="auth-container">
+      <div className="auth-box">
+        <div className="auth-header">
+          <h1>Sign in to your account</h1>
         </div>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="Email address"
+              disabled={loading}
+              autoComplete="email"
+            />
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            placeholder="Enter your password"
-            disabled={loading}
-          />
-        </div>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="Password"
+              disabled={loading}
+              autoComplete="current-password"
+            />
+          </div>
 
-        {error && <div className="error">{error}</div>}
+          {error && <div className="error">{error}</div>}
 
-        <button type="submit" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
+          <button type="submit" disabled={loading} className="auth-button">
+            {loading ? 'Signing in...' : 'Sign in'}
+          </button>
 
-        <div className="register-link">
-          Don&apos;t have an account? <Link to="/register">Create one</Link>
-        </div>
-      </form>
+          <div className="auth-link">
+            Don&apos;t have an account? <Link to="/register">Create one</Link>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

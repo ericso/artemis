@@ -61,10 +61,10 @@ describe('Login', () => {
   it('renders properly', () => {
     renderLogin();
     
-    expect(screen.getByRole('heading', { name: /login/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /sign in/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
   });
 
   it('shows loading state when submitting', async () => {
@@ -75,7 +75,7 @@ describe('Login', () => {
 
     renderLogin();
     
-    const loginButton = screen.getByRole('button', { name: /login/i });
+    const loginButton = screen.getByRole('button', { name: /sign in/i });
     const emailInput = screen.getByLabelText(/email/i);
     const passwordInput = screen.getByLabelText(/password/i);
 
@@ -85,7 +85,7 @@ describe('Login', () => {
 
     await waitFor(() => {
       expect(loginButton).toBeDisabled();
-      expect(loginButton).toHaveTextContent(/logging in/i);
+      expect(loginButton).toHaveTextContent(/signing in/i);
     });
   });
 
@@ -100,7 +100,7 @@ describe('Login', () => {
 
     renderLogin();
     
-    const loginButton = screen.getByRole('button', { name: /login/i });
+    const loginButton = screen.getByRole('button', { name: /sign in/i });
     const emailInput = screen.getByLabelText(/email/i);
     const passwordInput = screen.getByLabelText(/password/i);
 
@@ -127,7 +127,7 @@ describe('Login', () => {
 
     renderLogin();
     
-    const loginButton = screen.getByRole('button', { name: /login/i });
+    const loginButton = screen.getByRole('button', { name: /sign in/i });
     const emailInput = screen.getByLabelText(/email/i);
     const passwordInput = screen.getByLabelText(/password/i);
 
@@ -148,7 +148,7 @@ describe('Login', () => {
 
     renderLogin();
     
-    const loginButton = screen.getByRole('button', { name: /login/i });
+    const loginButton = screen.getByRole('button', { name: /sign in/i });
     const emailInput = screen.getByLabelText(/email/i);
     const passwordInput = screen.getByLabelText(/password/i);
 

@@ -31,59 +31,66 @@ function Register() {
   };
 
   return (
-    <div className="register">
-      <h1>Create Account</h1>
-      <form onSubmit={handleSubmit} className="register-form">
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            placeholder="Enter your email"
-            disabled={loading}
-          />
+    <div className="auth-container">
+      <div className="auth-box">
+        <div className="auth-header">
+          <h1>Create your account</h1>
         </div>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="Email address"
+              disabled={loading}
+              autoComplete="email"
+            />
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            placeholder="Enter your password"
-            disabled={loading}
-          />
-        </div>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="Password"
+              disabled={loading}
+              autoComplete="new-password"
+            />
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="confirmPassword">Confirm Password</label>
-          <input
-            id="confirmPassword"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            placeholder="Confirm your password"
-            disabled={loading}
-          />
-        </div>
+          <div className="form-group">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              placeholder="Confirm password"
+              disabled={loading}
+              autoComplete="new-password"
+            />
+          </div>
 
-        {error && <div className="error">{error}</div>}
-        {validationError && <div className="error">{validationError}</div>}
+          {error && <div className="error">{error}</div>}
+          {validationError && <div className="error">{validationError}</div>}
 
-        <button type="submit" disabled={loading}>
-          {loading ? 'Creating Account...' : 'Create Account'}
-        </button>
+          <button type="submit" disabled={loading} className="auth-button">
+            {loading ? 'Creating account...' : 'Create account'}
+          </button>
 
-        <div className="login-link">
-          Already have an account? <Link to="/login">Log in</Link>
-        </div>
-      </form>
+          <div className="auth-link">
+            Already have an account? <Link to="/login">Sign in</Link>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

@@ -4,6 +4,13 @@ import { FillupList } from '../FillupList';
 import { FillupService } from '@/services/fillup.service';
 import type { Fillup } from '@/services/fillup.service';
 
+// Mock the window.confirm
+const mockConfirm = vi.fn(() => true);
+Object.defineProperty(window, 'confirm', {
+  writable: true,
+  value: mockConfirm,
+});
+
 // Mock the FillupService
 vi.mock('@/services/fillup.service', () => ({
   FillupService: {
@@ -47,6 +54,7 @@ describe('FillupList', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockConfirm.mockClear();
   });
 
   it('renders loading state initially', () => {
@@ -155,10 +163,7 @@ describe('FillupList', () => {
 
   it('calls onDelete when delete button is clicked and confirmed', async () => {
     vi.mocked(FillupService.getFillups).mockResolvedValueOnce(mockFillups);
-    
-    // Mock window.confirm
-    const mockConfirm = vi.spyOn(window, 'confirm');
-    mockConfirm.mockImplementation(() => true);
+    mockConfirm.mockImplementationOnce(() => true);
 
     render(
       <FillupList
@@ -178,16 +183,11 @@ describe('FillupList', () => {
     expect(mockConfirm).toHaveBeenCalledWith('Are you sure you want to delete this fillup?');
     expect(mockOnDelete).toHaveBeenCalledTimes(1);
     expect(mockOnDelete).toHaveBeenCalledWith(mockFillups[0]);
-
-    mockConfirm.mockRestore();
   });
 
   it('does not call onDelete when delete is not confirmed', async () => {
     vi.mocked(FillupService.getFillups).mockResolvedValueOnce(mockFillups);
-    
-    // Mock window.confirm
-    const mockConfirm = vi.spyOn(window, 'confirm');
-    mockConfirm.mockImplementation(() => false);
+    mockConfirm.mockImplementationOnce(() => false);
 
     render(
       <FillupList
@@ -206,7 +206,5 @@ describe('FillupList', () => {
 
     expect(mockConfirm).toHaveBeenCalled();
     expect(mockOnDelete).not.toHaveBeenCalled();
-
-    mockConfirm.mockRestore();
   });
 }); 

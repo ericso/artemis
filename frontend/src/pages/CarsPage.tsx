@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Car, CarService, CreateCarDto } from '@/services/car.service';
+import { Fillup, FillupService } from '@/services/fillup.service';
 import { CarForm } from '@/components/CarForm';
+import { FillupList } from '@/components/FillupList';
+import { FillupForm } from '@/components/FillupForm';
 
 export const CarsPage: React.FC = () => {
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
-  const [showForm, setShowForm] = useState(false);
+  const [showCarForm, setShowCarForm] = useState(false);
+  const [showFillupForm, setShowFillupForm] = useState(false);
   const [selectedCar, setSelectedCar] = useState<Car | undefined>();
+  const [selectedFillup, setSelectedFillup] = useState<Fillup | undefined>();
 
   const loadCars = async () => {
     try {
@@ -30,7 +35,7 @@ export const CarsPage: React.FC = () => {
     try {
       await CarService.createCar(carData);
       await loadCars();
-      setShowForm(false);
+      setShowCarForm(false);
     } catch (err) {
       setError('Failed to create car. Please try again.');
     }
@@ -41,7 +46,7 @@ export const CarsPage: React.FC = () => {
     try {
       await CarService.updateCar(selectedCar.id, carData);
       await loadCars();
-      setShowForm(false);
+      setShowCarForm(false);
       setSelectedCar(undefined);
     } catch (err) {
       setError('Failed to update car. Please try again.');
@@ -64,99 +69,74 @@ export const CarsPage: React.FC = () => {
     }
   };
 
-  const handleEdit = (car: Car) => {
+  const handleEditCar = (car: Car) => {
     setSelectedCar(car);
-    setShowForm(true);
+    setShowCarForm(true);
+    setShowFillupForm(false);
   };
 
-  const handleCancel = () => {
-    setShowForm(false);
+  const handleCancelCarForm = () => {
+    setShowCarForm(false);
     setSelectedCar(undefined);
+  };
+
+  const handleAddFillup = () => {
+    setSelectedFillup(undefined);
+    setShowFillupForm(true);
+    setShowCarForm(false);
+  };
+
+  const handleEditFillup = (fillup: Fillup) => {
+    setSelectedFillup(fillup);
+    setShowFillupForm(true);
+    setShowCarForm(false);
+  };
+
+  const handleDeleteFillup = async (fillup: Fillup) => {
+    try {
+      await FillupService.deleteFillup(fillup.id);
+    } catch (err) {
+      setError('Failed to delete fillup. Please try again.');
+    }
+  };
+
+  const handleFillupFormSuccess = () => {
+    setShowFillupForm(false);
+    setSelectedFillup(undefined);
   };
 
   const handleSelectCar = (car: Car) => {
     setSelectedCar(car);
-    setShowForm(false);
+    setShowCarForm(false);
+    setShowFillupForm(false);
   };
 
   if (loading) {
     return (
-      <div style={{ 
-        height: '100%',
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}>
+      <div className="h-full w-full flex justify-center items-center">
         <div 
           data-testid="loading-spinner"
-          style={{
-            width: '20px',
-            height: '20px',
-            border: '2px solid #3b82f6',
-            borderTopColor: 'transparent',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }} 
+          className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"
         />
       </div>
     );
   }
 
   return (
-    <div style={{
-      height: '100%',
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'row'
-    }}>
+    <div className="h-full w-full flex flex-row">
       {/* Left Sidebar - Car List */}
-      <div style={{
-        width: '33.333333%',
-        minWidth: '300px',
-        borderRight: '1px solid #e5e7eb',
-        backgroundColor: '#f9fafb',
-        overflowY: 'auto'
-      }}>
-        <div style={{
-          padding: '1rem',
-          borderBottom: '1px solid #e5e7eb',
-          backgroundColor: 'white',
-          position: 'sticky',
-          top: 0,
-          zIndex: 10
-        }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <h2 style={{
-              fontSize: '1.25rem',
-              fontWeight: 'bold',
-              color: '#111827'
-            }}>My Cars</h2>
+      <div className="w-1/3 min-w-[300px] border-r border-gray-200 bg-gray-50 overflow-y-auto">
+        <div className="p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-gray-900">My Cars</h2>
             <button
               onClick={() => {
                 setSelectedCar(undefined);
-                setShowForm(true);
+                setShowCarForm(true);
               }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                padding: '0.375rem 0.75rem',
-                backgroundColor: '#2563eb',
-                color: 'white',
-                borderRadius: '0.375rem',
-                fontSize: '0.875rem',
-                fontWeight: '500'
-              }}
+              className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
             >
-              <svg style={{
-                width: '0.875rem',
-                height: '0.875rem',
-                marginRight: '0.25rem'
-              }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
               </svg>
               Add Car
@@ -166,11 +146,7 @@ export const CarsPage: React.FC = () => {
 
         <div>
           {cars.length === 0 ? (
-            <div style={{
-              padding: '1rem',
-              textAlign: 'center',
-              color: '#6b7280'
-            }}>
+            <div className="p-4 text-center text-gray-500">
               No cars found. Add your first car!
             </div>
           ) : (
@@ -178,25 +154,14 @@ export const CarsPage: React.FC = () => {
               <div
                 key={car.id}
                 onClick={() => handleSelectCar(car)}
-                style={{
-                  padding: '1rem',
-                  cursor: 'pointer',
-                  backgroundColor: selectedCar?.id === car.id ? '#eff6ff' : 'transparent',
-                  borderLeft: selectedCar?.id === car.id ? '4px solid #3b82f6' : 'none'
-                }}
+                className={`p-4 cursor-pointer ${
+                  selectedCar?.id === car.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                }`}
               >
-                <h3 style={{
-                  fontSize: '1.125rem',
-                  fontWeight: '500',
-                  color: '#111827'
-                }}>
+                <h3 className="text-lg font-medium text-gray-900">
                   {car.name || `${car.year} ${car.make} ${car.model}`}
                 </h3>
-                <p style={{
-                  marginTop: '0.25rem',
-                  fontSize: '0.875rem',
-                  color: '#6b7280'
-                }}>
+                <p className="mt-1 text-sm text-gray-500">
                   {car.make} {car.model} • {car.year}
                 </p>
               </div>
@@ -206,98 +171,49 @@ export const CarsPage: React.FC = () => {
       </div>
 
       {/* Right Content - Car Details/Form */}
-      <div style={{
-        flex: 1,
-        backgroundColor: 'white',
-        overflowY: 'auto',
-        padding: '1.5rem'
-      }}>
-        {showForm ? (
+      <div className="flex-1 bg-white overflow-y-auto p-6">
+        {showCarForm ? (
           <>
-            <div style={{ marginBottom: '1.5rem' }}>
-              <h2 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#111827'
-              }}>
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
                 {selectedCar ? 'Edit Car' : 'Add New Car'}
               </h2>
-              <p style={{
-                marginTop: '0.25rem',
-                fontSize: '0.875rem',
-                color: '#6b7280'
-              }}>
+              <p className="mt-1 text-sm text-gray-500">
                 {selectedCar ? 'Update the details of your car.' : 'Add a new car to your collection.'}
               </p>
             </div>
             <CarForm
               car={selectedCar}
               onSubmit={selectedCar ? handleUpdateCar : handleCreateCar}
-              onCancel={handleCancel}
+              onCancel={handleCancelCarForm}
             />
           </>
         ) : selectedCar ? (
           <>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1.5rem' }}>
+            <div className="flex justify-between items-start mb-6">
               <div>
-                <h2 style={{
-                  fontSize: '1.5rem',
-                  fontWeight: 'bold',
-                  color: '#111827'
-                }}>
+                <h2 className="text-2xl font-bold text-gray-900">
                   {selectedCar.name || `${selectedCar.year} ${selectedCar.make} ${selectedCar.model}`}
                 </h2>
-                <p style={{
-                  marginTop: '0.25rem',
-                  fontSize: '0.875rem',
-                  color: '#6b7280'
-                }}>
+                <p className="mt-1 text-sm text-gray-500">
                   Detailed information about your vehicle
                 </p>
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <div className="flex gap-2">
                 <button
-                  onClick={() => handleEdit(selectedCar)}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    padding: '0.375rem 0.75rem',
-                    backgroundColor: 'white',
-                    color: '#3b82f6',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '0.375rem',
-                    fontSize: '0.875rem',
-                    fontWeight: '500'
-                  }}
+                  onClick={() => handleEditCar(selectedCar)}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                 >
-                  <svg style={{
-                    width: '0.875rem',
-                    height: '0.875rem',
-                    marginRight: '0.25rem'
-                  }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
                   Edit
                 </button>
                 <button
                   onClick={() => handleDeleteCar(selectedCar)}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    padding: '0.375rem 0.75rem',
-                    backgroundColor: 'white',
-                    color: '#ef4444',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '0.375rem',
-                    fontSize: '0.875rem',
-                    fontWeight: '500'
-                  }}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-red-600 bg-white hover:bg-gray-50"
                 >
-                  <svg style={{
-                    width: '0.875rem',
-                    height: '0.875rem',
-                    marginRight: '0.25rem'
-                  }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                   Delete
@@ -305,81 +221,90 @@ export const CarsPage: React.FC = () => {
               </div>
             </div>
 
-            <div style={{ backgroundColor: '#f9fafb', padding: '1.5rem', borderRadius: '0.375rem' }}>
-              <dl style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '1.5rem' }}>
+            <div className="bg-gray-50 p-6 rounded-lg mb-6">
+              <dl className="grid grid-cols-2 gap-6">
                 <div>
-                  <dt style={{ fontSize: '0.875rem', fontWeight: '500', color: '#6b7280' }}>Make</dt>
-                  <dd style={{ marginTop: '0.25rem', fontSize: '1rem', fontWeight: '500', color: '#111827' }}>{selectedCar.make}</dd>
+                  <dt className="text-sm font-medium text-gray-500">Make</dt>
+                  <dd className="mt-1 text-base font-medium text-gray-900">{selectedCar.make}</dd>
                 </div>
                 <div>
-                  <dt style={{ fontSize: '0.875rem', fontWeight: '500', color: '#6b7280' }}>Model</dt>
-                  <dd style={{ marginTop: '0.25rem', fontSize: '1rem', fontWeight: '500', color: '#111827' }}>{selectedCar.model}</dd>
+                  <dt className="text-sm font-medium text-gray-500">Model</dt>
+                  <dd className="mt-1 text-base font-medium text-gray-900">{selectedCar.model}</dd>
                 </div>
                 <div>
-                  <dt style={{ fontSize: '0.875rem', fontWeight: '500', color: '#6b7280' }}>Year</dt>
-                  <dd style={{ marginTop: '0.25rem', fontSize: '1rem', fontWeight: '500', color: '#111827' }}>{selectedCar.year}</dd>
+                  <dt className="text-sm font-medium text-gray-500">Year</dt>
+                  <dd className="mt-1 text-base font-medium text-gray-900">{selectedCar.year}</dd>
                 </div>
                 {selectedCar.vin && (
                   <div>
-                    <dt style={{ fontSize: '0.875rem', fontWeight: '500', color: '#6b7280' }}>VIN</dt>
-                    <dd style={{ marginTop: '0.25rem', fontSize: '1rem', fontWeight: '500', color: '#111827', fontFamily: 'monospace' }}>{selectedCar.vin}</dd>
+                    <dt className="text-sm font-medium text-gray-500">VIN</dt>
+                    <dd className="mt-1 text-base font-medium text-gray-900 font-mono">{selectedCar.vin}</dd>
                   </div>
                 )}
                 {selectedCar.name && (
-                  <div style={{ gridColumn: 'span 2' }}>
-                    <dt style={{ fontSize: '0.875rem', fontWeight: '500', color: '#6b7280' }}>Nickname</dt>
-                    <dd style={{ marginTop: '0.25rem', fontSize: '1rem', fontWeight: '500', color: '#111827' }}>{selectedCar.name}</dd>
+                  <div className="col-span-2">
+                    <dt className="text-sm font-medium text-gray-500">Nickname</dt>
+                    <dd className="mt-1 text-base font-medium text-gray-900">{selectedCar.name}</dd>
                   </div>
                 )}
               </dl>
             </div>
+
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium text-gray-900">Fillup History</h3>
+                <button
+                  onClick={handleAddFillup}
+                  className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                >
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Fillup
+                </button>
+              </div>
+
+              {showFillupForm ? (
+                <FillupForm
+                  carId={selectedCar.id}
+                  fillup={selectedFillup}
+                  onSuccess={handleFillupFormSuccess}
+                  onCancel={() => {
+                    setShowFillupForm(false);
+                    setSelectedFillup(undefined);
+                  }}
+                />
+              ) : (
+                <FillupList
+                  carId={selectedCar.id}
+                  onEdit={handleEditFillup}
+                  onDelete={handleDeleteFillup}
+                />
+              )}
+            </div>
           </>
         ) : (
-          <div style={{
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <div style={{ textAlign: 'center' }}>
-              <h3 style={{
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: '#111827'
-              }}>No car selected</h3>
-              <p style={{
-                marginTop: '0.25rem',
-                fontSize: '0.875rem',
-                color: '#6b7280'
-              }}>Select a car from the list to view its details</p>
+          <div className="h-full flex items-center justify-center">
+            <div className="text-center">
+              <h3 className="text-sm font-medium text-gray-900">No car selected</h3>
+              <p className="mt-1 text-sm text-gray-500">
+                Select a car from the list to view its details
+              </p>
             </div>
           </div>
         )}
       </div>
 
       {error && (
-        <div style={{
-          position: 'fixed',
-          bottom: '1rem',
-          right: '1rem',
-          backgroundColor: '#fef2f2',
-          color: '#b91c1c',
-          padding: '0.75rem 1rem',
-          borderRadius: '0.5rem',
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-        }}>
-          <div style={{ display: 'flex' }}>
-            <div style={{ flexShrink: 0 }}>
-              <svg style={{
-                width: '0.875rem',
-                height: '0.875rem',
-                color: '#f87171'
-              }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="fixed bottom-4 right-4 bg-red-50 text-red-700 p-3 rounded-lg shadow-lg">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <div style={{ marginLeft: '0.5rem' }}>
-              <p style={{ fontSize: '0.875rem' }}>{error}</p>
+            <div className="ml-2">
+              <p className="text-sm">{error}</p>
             </div>
           </div>
         </div>

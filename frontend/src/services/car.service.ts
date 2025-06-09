@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '@/lib/axios';
 
 export interface Car {
   id: string;
@@ -21,76 +21,40 @@ export interface CreateCarDto {
   name?: string;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-// Create axios instance with auth interceptor
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  withCredentials: true
-});
-
-// Add request interceptor for authentication
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    // Log the request configuration for debugging
-    console.log('Car Service Request:', {
-      url: config.url,
-      method: config.method,
-      headers: config.headers,
-      token: token ? 'Present' : 'Not found'
-    });
-    return config;
-  },
-  (error) => {
-    console.error('Car Service Request Error:', error);
-    return Promise.reject(error);
-  }
-);
-
-// Add response interceptor for debugging
-api.interceptors.response.use(
-  (response) => {
-    console.log('Car Service Response:', {
-      status: response.status,
-      data: response.data,
-      headers: response.headers
-    });
-    return response;
-  },
-  (error) => {
-    console.error('Car Service Response Error:', {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
-    return Promise.reject(error);
-  }
-);
-
 export const CarService = {
   async getCars(): Promise<Car[]> {
-    const response = await api.get('/cars');
-    return response.data;
+    const response = await axios.get<Car[]>('/cars');
+    return response.data.map(car => ({
+      ...car,
+      created_at: new Date(car.created_at),
+      updated_at: car.updated_at ? new Date(car.updated_at) : null,
+      deleted_at: car.deleted_at ? new Date(car.deleted_at) : null,
+    }));
   },
 
   async createCar(car: CreateCarDto): Promise<Car> {
-    const response = await api.post('/cars', car);
-    return response.data;
+    const response = await axios.post<Car>('/cars', car);
+    const newCar = response.data;
+    return {
+      ...newCar,
+      created_at: new Date(newCar.created_at),
+      updated_at: newCar.updated_at ? new Date(newCar.updated_at) : null,
+      deleted_at: newCar.deleted_at ? new Date(newCar.deleted_at) : null,
+    };
   },
 
   async updateCar(id: string, car: Partial<CreateCarDto>): Promise<Car> {
-    const response = await api.put(`/cars/${id}`, car);
-    return response.data;
+    const response = await axios.put<Car>(`/cars/${id}`, car);
+    const updatedCar = response.data;
+    return {
+      ...updatedCar,
+      created_at: new Date(updatedCar.created_at),
+      updated_at: updatedCar.updated_at ? new Date(updatedCar.updated_at) : null,
+      deleted_at: updatedCar.deleted_at ? new Date(updatedCar.deleted_at) : null,
+    };
   },
 
   async deleteCar(id: string): Promise<void> {
-    await api.delete(`/cars/${id}`);
+    await axios.delete(`/cars/${id}`);
   }
 }; 

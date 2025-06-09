@@ -1,0 +1,83 @@
+service: artemis-api
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  environment:
+    NODE_ENV: ${self:provider.stage}
+    DB_HOST: ${ssm:/artemis/${self:provider.stage}/db/host}
+    DB_USER: ${ssm:/artemis/${self:provider.stage}/db/user}
+    DB_PASSWORD: ${ssm:/artemis/${self:provider.stage}/db/password}
+    DB_NAME: ${ssm:/artemis/${self:provider.stage}/db/name}
+    DB_PORT: ${ssm:/artemis/${self:provider.stage}/db/port}
+    JWT_SECRET: ${ssm:/artemis/${self:provider.stage}/jwt/secret}
+    FRONTEND_URL: ${ssm:/artemis/${self:provider.stage}/frontend/url}
+  vpc:
+    securityGroupIds:
+      - ${ssm:/artemis/${self:provider.stage}/vpc/securityGroupId}
+    subnetIds:
+      - ${ssm:/artemis/${self:provider.stage}/vpc/subnetId1}
+      - ${ssm:/artemis/${self:provider.stage}/vpc/subnetId2}
+
+functions:
+  api:
+    handler: dist/lambda.handler
+    events:
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
+    timeout: 30
+    memorySize: 1024
+
+package:
+  patterns:
+    - '!node_modules/.prisma/client/libquery_engine-*'
+    - '!node_modules/prisma/libquery_engine-*'
+    - '!node_modules/@prisma/engines/**'
+    - '!tests/**'
+    - '!coverage/**'
+    - '!.env*'
+    - '!tsconfig.json'
+    - '!README.md'
+    - '!jest.config.js'
+    - '!.git/**'
+    - '!.vscode/**'
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 3000
+    host: localhost
+    noPrependStageInUrl: true
+    allowCache: false
+    corsConfig:
+      origin: '*'
+      headers:
+        - Content-Type
+        - Authorization
+      credentials: false
+  httpApi:
+    cors:
+      allowedOrigins:
+        - ${ssm:/artemis/${self:provider.stage}/frontend/url}
+        - http://localhost:5173
+        - http://127.0.0.1:5173
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowedMethods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      allowCredentials: false
+      maxAge: 86400
+  serverlessPluginTypescript:
+    tsConfigFileLocation: './tsconfig.json' 

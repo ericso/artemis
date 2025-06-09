@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, RequestHandler } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { hashPassword, comparePassword, generateToken } from '@utils/auth.utils';
 import { UserService } from '@services/user.service';
@@ -12,8 +12,8 @@ export interface AuthRequestBody {
 
 export interface AuthResponse {
   message: string;
-  token: string;
-  user: {
+  token?: string;
+  user?: {
     id: string;
     email: string;
   };
@@ -22,13 +22,14 @@ export interface AuthResponse {
 export class AuthController {
   constructor(private userService: UserService = new PostgresUserService()) {}
 
-  register = async (req: Request<Record<string, never>, AuthResponse, AuthRequestBody>, res: Response): Promise<Response> => {
+  register: RequestHandler = async (req, res): Promise<void> => {
     try {
-      const { email, password } = req.body;
+      const { email, password } = req.body as AuthRequestBody;
 
       const existingUser = await this.userService.findByEmail(email);
       if (existingUser) {
-        return res.status(400).json({ message: "User already exists" });
+        res.status(400).json({ message: "User already exists" });
+        return;
       }
 
       const hashedPassword = await hashPassword(password);
@@ -44,7 +45,7 @@ export class AuthController {
       const createdUser = await this.userService.create(newUser);
       const token = generateToken(createdUser);
 
-      return res.status(201).json({
+      res.status(201).json({
         message: "User registered successfully",
         token,
         user: {
@@ -53,27 +54,29 @@ export class AuthController {
         }
       });
     } catch (error) {
-      return res.status(500).json({ message: "Error registering user" });
+      res.status(500).json({ message: "Error registering user" });
     }
   };
 
-  login = async (req: Request<Record<string, never>, AuthResponse, AuthRequestBody>, res: Response): Promise<Response> => {
+  login: RequestHandler = async (req, res): Promise<void> => {
     try {
-      const { email, password } = req.body;
+      const { email, password } = req.body as AuthRequestBody;
 
       const user = await this.userService.findByEmail(email);
       if (!user) {
-        return res.status(401).json({ message: "Invalid credentials" });
+        res.status(401).json({ message: "Invalid credentials" });
+        return;
       }
 
       const isPasswordValid = await comparePassword(password, user.password);
       if (!isPasswordValid) {
-        return res.status(401).json({ message: "Invalid credentials" });
+        res.status(401).json({ message: "Invalid credentials" });
+        return;
       }
 
       const token = generateToken(user);
 
-      return res.status(200).json({
+      res.status(200).json({
         message: "Login successful",
         token,
         user: {
@@ -82,7 +85,7 @@ export class AuthController {
         }
       });
     } catch (error) {
-      return res.status(500).json({ message: "Error logging in" });
+      res.status(500).json({ message: "Error logging in" });
     }
   };
 }

@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions, Secret } from 'jsonwebtoken';
 import { JWT_SECRET, JWT_EXPIRES_IN } from '@config/auth.config';
 import { User } from '@models/user';
 
@@ -23,5 +23,7 @@ export const generateToken = (user: Partial<User>): string => {
   }
   
   const payload: JWTPayload = { id: user.id, email: user.email };
-  return jwt.sign(payload, Buffer.from(JWT_SECRET), { expiresIn: JWT_EXPIRES_IN });
+  const secret: Secret = JWT_SECRET;
+  
+  return jwt.sign(payload, secret);
 }; 

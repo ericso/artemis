@@ -17,11 +17,12 @@ export function FillupList({ carId, onEdit, onDelete }: FillupListProps) {
     try {
       setLoading(true);
       const data = await FillupService.getFillups(carId);
-      setFillups(data);
+      setFillups(data || []);
       setError(null);
     } catch (err) {
       setError('Failed to load fillups. Please try again.');
       console.error('Error loading fillups:', err);
+      setFillups([]);
     } finally {
       setLoading(false);
     }
@@ -61,7 +62,7 @@ export function FillupList({ carId, onEdit, onDelete }: FillupListProps) {
     );
   }
 
-  if (fillups.length === 0) {
+  if (!fillups || fillups.length === 0) {
     return (
       <div className="text-center py-4 text-gray-500">
         No fillups recorded yet.

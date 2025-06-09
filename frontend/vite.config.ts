@@ -2,6 +2,8 @@ import { defineConfig, UserConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
 import type { InlineConfig } from 'vitest'
+import tailwindcss from 'tailwindcss'
+import autoprefixer from 'autoprefixer'
 
 interface VitestConfigExport extends UserConfig {
   test: InlineConfig
@@ -10,6 +12,14 @@ interface VitestConfigExport extends UserConfig {
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  css: {
+    postcss: {
+      plugins: [
+        tailwindcss,
+        autoprefixer
+      ]
+    }
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

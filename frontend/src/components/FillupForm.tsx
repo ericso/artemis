@@ -40,7 +40,8 @@ export function FillupForm({ carId, fillup, onSuccess, onCancel }: FillupFormPro
     setFormData(prev => ({
       ...prev,
       [name]: name === 'date' ? new Date(value) :
-              ['gallons', 'total_cost', 'odometer_reading'].includes(name) ? parseFloat(value) || 0 :
+              ['gallons', 'total_cost'].includes(name) ? parseFloat(value) || 0 :
+              name === 'odometer_reading' ? parseInt(value) || 0 :
               value
     }));
   };
@@ -51,10 +52,16 @@ export function FillupForm({ carId, fillup, onSuccess, onCancel }: FillupFormPro
     setIsSubmitting(true);
 
     try {
+      const submissionData = {
+        ...formData,
+        gallons: Number(formData.gallons.toFixed(3)),
+        total_cost: Number(formData.total_cost.toFixed(2))
+      };
+
       if (fillup) {
-        await FillupService.updateFillup(fillup.id, formData);
+        await FillupService.updateFillup(fillup.id, submissionData);
       } else {
-        await FillupService.createFillup(formData);
+        await FillupService.createFillup(submissionData);
       }
       onSuccess();
     } catch (err) {
@@ -83,34 +90,34 @@ export function FillupForm({ carId, fillup, onSuccess, onCancel }: FillupFormPro
 
       <div>
         <label htmlFor="gallons" className="block text-sm font-medium text-gray-700">
-          Gallons *
+          Gallons * (up to 3 decimal places)
         </label>
         <input
           type="number"
           id="gallons"
           name="gallons"
-          value={formData.gallons}
+          value={formData.gallons || ''}
           onChange={handleChange}
           required
           min="0"
-          step="0.001"
+          step="any"
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         />
       </div>
 
       <div>
         <label htmlFor="total_cost" className="block text-sm font-medium text-gray-700">
-          Total Cost *
+          Total Cost * (up to 2 decimal places)
         </label>
         <input
           type="number"
           id="total_cost"
           name="total_cost"
-          value={formData.total_cost}
+          value={formData.total_cost || ''}
           onChange={handleChange}
           required
           min="0"
-          step="0.01"
+          step="any"
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         />
       </div>
@@ -123,7 +130,7 @@ export function FillupForm({ carId, fillup, onSuccess, onCancel }: FillupFormPro
           type="number"
           id="odometer_reading"
           name="odometer_reading"
-          value={formData.odometer_reading}
+          value={formData.odometer_reading || ''}
           onChange={handleChange}
           required
           min="0"

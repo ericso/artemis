@@ -95,9 +95,6 @@ export const CarsPage: React.FC = () => {
   const handleDeleteFillup = async (fillup: Fillup) => {
     try {
       await FillupService.deleteFillup(fillup.id);
-      // Force re-render of FillupList by toggling showFillupForm
-      setShowFillupForm(false);
-      setSelectedFillup(undefined);
     } catch (err) {
       setError('Failed to delete fillup. Please try again.');
     }

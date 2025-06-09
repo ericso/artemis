@@ -31,6 +31,18 @@ export function FillupList({ carId, onEdit, onDelete }: FillupListProps) {
     }
   };
 
+  const handleDelete = async (fillup: Fillup) => {
+    if (window.confirm('Are you sure you want to delete this fillup?')) {
+      try {
+        await onDelete(fillup);
+        // Reload the fillups after successful deletion
+        await loadFillups();
+      } catch (err) {
+        setError('Failed to delete fillup. Please try again.');
+      }
+    }
+  };
+
   if (loading) {
     return <div className="text-center py-4">Loading fillups...</div>;
   }
@@ -120,11 +132,7 @@ export function FillupList({ carId, onEdit, onDelete }: FillupListProps) {
                   Edit
                 </button>
                 <button
-                  onClick={() => {
-                    if (window.confirm('Are you sure you want to delete this fillup?')) {
-                      onDelete(fillup);
-                    }
-                  }}
+                  onClick={() => handleDelete(fillup)}
                   className="text-red-600 hover:text-red-900"
                 >
                   Delete

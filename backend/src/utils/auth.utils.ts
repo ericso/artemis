@@ -12,10 +12,16 @@ export const comparePassword = async (password: string, hash: string): Promise<b
   return bcrypt.compare(password, hash);
 };
 
+interface JWTPayload {
+  id: string | undefined;
+  email: string | undefined;
+}
+
 export const generateToken = (user: Partial<User>): string => {
-  return jwt.sign(
-    { id: user.id, email: user.email },
-    JWT_SECRET,
-    { expiresIn: JWT_EXPIRES_IN }
-  );
+  if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET is not configured');
+  }
+  
+  const payload: JWTPayload = { id: user.id, email: user.email };
+  return jwt.sign(payload, Buffer.from(JWT_SECRET), { expiresIn: JWT_EXPIRES_IN });
 }; 

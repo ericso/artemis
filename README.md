@@ -5,7 +5,7 @@ An app that tracks your cars and their mileage.
 ## Project Structure
 
 ```
-artemis/
+autostat/
 ├── backend/         # Express.js backend
 ├── frontend/        # React frontend
 ├── aws/            # AWS configuration and scripts

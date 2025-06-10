@@ -1,6 +1,6 @@
-# Artemis API
+# AutoStat API
 
-This is the backend API for the Artemis application, designed to run on AWS Lambda with Aurora Serverless v2.
+This is the backend API for the AutoStat application, designed to run on AWS Lambda with Aurora Serverless v2.
 
 ## Prerequisites
 

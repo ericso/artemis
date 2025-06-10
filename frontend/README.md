@@ -1,6 +1,6 @@
-# Artemis Frontend
+# AutoStat Frontend
 
-React frontend for the Artemis application, providing a modern and responsive user interface for car mileage tracking.
+React frontend for the AutoStat application, providing a modern and responsive user interface for car mileage tracking.
 
 ## Features
 

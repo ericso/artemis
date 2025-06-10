@@ -18,7 +18,7 @@ function Dashboard() {
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', height: '4rem', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#1f2937' }}>Artemis</span>
+              <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#1f2937' }}>AutoStat</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <span style={{ color: '#4b5563' }}>{user?.email}</span>

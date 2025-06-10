@@ -1,0 +1,11 @@
+# This is an example file showing the SSM parameter pattern used in AWS.
+# The actual values are stored in AWS Systems Manager Parameter Store.
+{
+  "DB_HOST": "ssm:/artemis/dev/db/host",
+  "DB_USER": "ssm:/artemis/dev/db/user",
+  "DB_PASSWORD": "ssm:/artemis/dev/db/password",
+  "DB_NAME": "ssm:/artemis/dev/db/name",
+  "DB_PORT": "ssm:/artemis/dev/db/port",
+  "JWT_SECRET": "ssm:/artemis/dev/jwt/secret",
+  "FRONTEND_URL": "ssm:/artemis/dev/frontend/url"
+} 

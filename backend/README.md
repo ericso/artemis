@@ -1,6 +1,86 @@
-# Artemis Backend
+# Artemis API
 
-The backend service for Artemis, built with Express.js and TypeScript. This service handles authentication, data persistence, and business logic for the Artemis application.
+This is the backend API for the Artemis application, designed to run on AWS Lambda with Aurora Serverless v2.
+
+## Prerequisites
+
+- Node.js 18.x or later
+- AWS CLI configured with appropriate credentials
+- Serverless Framework CLI (`npm install -g serverless`)
+
+## Setup
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Set up AWS Systems Manager Parameter Store with the following parameters:
+   - /artemis/{stage}/db/host
+   - /artemis/{stage}/db/user
+   - /artemis/{stage}/db/password
+   - /artemis/{stage}/db/name
+   - /artemis/{stage}/db/port
+   - /artemis/{stage}/jwt/secret
+   - /artemis/{stage}/frontend/url
+   - /artemis/{stage}/vpc/securityGroupId
+   - /artemis/{stage}/vpc/subnetId1
+   - /artemis/{stage}/vpc/subnetId2
+
+3. Create Aurora Serverless v2 cluster in AWS:
+   - Use the AWS Console or CLI to create an Aurora Serverless v2 cluster
+   - Configure the security group to allow access from Lambda functions
+   - Note down the cluster endpoint and credentials
+
+4. Run database migrations:
+```bash
+npm run migrate
+```
+
+## Development
+
+For local development:
+```bash
+npm run dev
+```
+
+This will start the server locally using serverless-offline.
+
+## Deployment
+
+Deploy to development:
+```bash
+npm run deploy
+```
+
+Deploy to production:
+```bash
+npm run deploy:prod
+```
+
+## Architecture
+
+- **API Gateway**: Handles HTTP requests and forwards them to Lambda
+- **Lambda**: Runs the Express.js application
+- **Aurora Serverless v2**: PostgreSQL-compatible database that scales automatically
+- **VPC**: Lambda functions run in a VPC to securely connect to Aurora
+- **Systems Manager**: Stores configuration and secrets
+
+## Important Notes
+
+1. The database connection pool is optimized for Lambda:
+   - Uses a maximum of 1 connection per Lambda container
+   - Configured with appropriate timeouts
+   - SSL enabled for Aurora Serverless v2
+
+2. Environment variables are managed through AWS Systems Manager Parameter Store
+
+3. The application is configured to run in a VPC to access Aurora Serverless v2
+
+4. Cold starts are minimized by:
+   - Using connection pooling
+   - Optimizing the Lambda package size
+   - Setting appropriate memory and timeout values
 
 ## Features
 

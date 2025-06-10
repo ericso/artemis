@@ -2,13 +2,22 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-// Create axios instance with base URL
-const axiosInstance = axios.create({
+export const api = axios.create({
   baseURL: API_URL,
   headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// Create axios instance with base URL
+const axiosInstance = axios.create({
+  baseURL: API_URL.replace(/\/$/, ''), // Remove trailing slash if present
+  headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json'
   },
-  withCredentials: true // Enable sending cookies with requests
+  withCredentials: false,
+  timeout: 10000 // 10 second timeout
 });
 
 // Add request interceptor to include auth token
@@ -18,17 +27,10 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    // Log the request configuration for debugging
-    console.log('API Request:', {
-      url: config.url,
-      method: config.method,
-      headers: config.headers,
-      token: token ? 'Present' : 'Not found'
-    });
     return config;
   },
   (error) => {
-    console.error('API Request Error:', error);
+    console.error('Request configuration error:', error.message);
     return Promise.reject(error);
   }
 );
@@ -36,22 +38,22 @@ axiosInstance.interceptors.request.use(
 // Add response interceptor to handle errors
 axiosInstance.interceptors.response.use(
   (response) => {
-    // Log the response for debugging
-    console.log('API Response:', {
-      status: response.status,
-      data: response.data,
-      headers: response.headers
-    });
     return response;
   },
   (error) => {
-    console.error('API Response Error:', {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
+    if (error.code === 'ERR_NETWORK') {
+      console.error('Network Error Details:', {
+        message: error.message,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          baseURL: error.config?.baseURL,
+          headers: error.config?.headers
+        }
+      });
+    }
+    
     if (error.response?.status === 401) {
-      // Handle unauthorized access
       localStorage.removeItem('token');
       window.location.href = '/login';
     }

@@ -4,20 +4,28 @@ import authRoutes from '@routes/auth.routes';
 import carRoutes from '@routes/car.routes';
 import fillupRoutes from '@routes/fillup.routes';
 import { verifyToken, AuthRequest } from '@middleware/auth.middleware';
+import { env } from '@config/env';
 
 const app: Express = express();
-const port = process.env.PORT || 3000;
+
+// Basic CORS configuration
+app.use(cors({
+  origin: env.FRONTEND_URL,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Middleware for parsing JSON bodies
 app.use(express.json());
 
-// CORS middleware
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173', // Vue.js dev server default port
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+// Health check endpoint
+app.get('/health', (_req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    env: env.NODE_ENV
+  });
+});
 
 // Routes
 app.use('/auth', authRoutes);
@@ -39,13 +47,8 @@ app.get('/', (req: Request, res: Response) => {
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
-});
-
-// Start server
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+  console.error('Error:', err);
+  res.status(500).json({ message: 'Something went wrong!', error: err.message });
 });
 
 export default app; 

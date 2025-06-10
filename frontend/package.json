@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run --environment jsdom",
     "test:watch": "vitest --environment jsdom",
+    "test:coverage": "vitest run --coverage --environment jsdom",
     "type-check": "tsc --noEmit",
     "lint": "eslint --fix \"src/**/*.{ts,tsx}\"",
     "format": "prettier --write src/"

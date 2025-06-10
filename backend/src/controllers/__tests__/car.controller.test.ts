@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, Mock, SpyInstance } from 'vitest';
 import { Response } from 'express';
 import { CarController } from '@controllers/car.controller';
 import { PostgresCarService } from '@services/postgres-car.service';
@@ -7,24 +7,23 @@ import { AuthRequest } from '@middleware/auth.middleware';
 
 // Mock the uuid generation
 vi.mock('uuid', () => ({
-  v4: vi.fn(() => 'mock-uuid')
+  v4: () => 'mock-uuid'
 }));
 
 describe('CarController', () => {
   let mockRequest: Partial<AuthRequest>;
   let mockResponse: Partial<Response>;
   let mockCarService: {
-    create: Mock;
     findById: Mock;
-    update: Mock;
     findByUserId: Mock;
+    create: Mock;
+    update: Mock;
     softDelete: Mock;
   };
   let carController: CarController;
-  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+  let consoleErrorSpy: SpyInstance;
 
   beforeEach(() => {
-    // Suppress console.error messages
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     mockCarService = {

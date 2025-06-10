@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import axios from 'axios';
+import api from '@/lib/axios';
 
 interface User {
   id: string;
@@ -23,57 +23,6 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
-
-// Create axios instance with interceptors for debugging
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  withCredentials: true // Enable sending cookies with requests
-});
-
-// Add request interceptor for authentication
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    console.log('API Request:', {
-      url: config.url,
-      method: config.method,
-      data: config.data,
-      headers: config.headers
-    });
-    return config;
-  },
-  (error) => {
-    console.error('API Request Error:', error);
-    return Promise.reject(error);
-  }
-);
-
-// Add response interceptor
-api.interceptors.response.use(
-  (response) => {
-    console.log('API Response:', {
-      status: response.status,
-      data: response.data,
-      headers: response.headers
-    });
-    return response;
-  },
-  (error) => {
-    console.error('API Response Error:', {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message,
-      headers: error.response?.headers
-    });
-    return Promise.reject(error);
-  }
-);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));

@@ -12,8 +12,8 @@ export interface AuthRequestBody {
 
 export interface AuthResponse {
   message: string;
-  token?: string;
-  user?: {
+  token: string;
+  user: {
     id: string;
     email: string;
   };
@@ -25,6 +25,11 @@ export class AuthController {
   register: RequestHandler = async (req, res): Promise<void> => {
     try {
       const { email, password } = req.body as AuthRequestBody;
+      
+      if (!email || !password) {
+        res.status(400).json({ message: "Email and password are required" });
+        return;
+      }
 
       const existingUser = await this.userService.findByEmail(email);
       if (existingUser) {
@@ -33,6 +38,7 @@ export class AuthController {
       }
 
       const hashedPassword = await hashPassword(password);
+      
       const newUser: User = {
         id: uuidv4(),
         email,
@@ -54,6 +60,7 @@ export class AuthController {
         }
       });
     } catch (error) {
+      console.error('Registration error:', error);
       res.status(500).json({ message: "Error registering user" });
     }
   };
@@ -85,6 +92,7 @@ export class AuthController {
         }
       });
     } catch (error) {
+      console.error('Login error:', error);
       res.status(500).json({ message: "Error logging in" });
     }
   };

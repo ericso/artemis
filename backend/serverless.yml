@@ -3,35 +3,31 @@ service: autostat-api
 provider:
   name: aws
   runtime: nodejs18.x
-  stage: ${opt:stage, 'dev'}
+  stage: ${opt:stage, 'local'}
   region: us-east-1
   environment:
     NODE_ENV: ${self:provider.stage}
-    DB_HOST: ${ssm:/artemis/${self:provider.stage}/db/host}
-    DB_USER: ${ssm:/artemis/${self:provider.stage}/db/user}
-    DB_PASSWORD: ${ssm:/artemis/${self:provider.stage}/db/password}
-    DB_NAME: ${ssm:/artemis/${self:provider.stage}/db/name}
-    DB_PORT: ${ssm:/artemis/${self:provider.stage}/db/port}
-    JWT_SECRET: ${ssm:/artemis/${self:provider.stage}/jwt/secret}
-    FRONTEND_URL: ${ssm:/artemis/${self:provider.stage}/frontend/url}
-  vpc:
-    securityGroupIds:
-      - ${ssm:/artemis/${self:provider.stage}/vpc/securityGroupId}
-    subnetIds:
-      - ${ssm:/artemis/${self:provider.stage}/vpc/subnetId1}
-      - ${ssm:/artemis/${self:provider.stage}/vpc/subnetId2}
+    DB_HOST: ${self:custom.environment.${self:provider.stage}.DB_HOST}
+    DB_USER: ${self:custom.environment.${self:provider.stage}.DB_USER}
+    DB_PASSWORD: ${self:custom.environment.${self:provider.stage}.DB_PASSWORD}
+    DB_NAME: ${self:custom.environment.${self:provider.stage}.DB_NAME}
+    DB_PORT: ${self:custom.environment.${self:provider.stage}.DB_PORT}
+    JWT_SECRET: ${self:custom.environment.${self:provider.stage}.JWT_SECRET}
+    FRONTEND_URL: ${self:custom.environment.${self:provider.stage}.FRONTEND_URL}
 
 functions:
   api:
     handler: dist/lambda.handler
     events:
-      - httpApi:
+      - http:
           path: /health
           method: GET
-      - httpApi:
+          cors: true
+      - http:
           path: /{proxy+}
           method: ANY
-    timeout: 30
+          cors: true
+    timeout: 60
     memorySize: 1024
 
 package:
@@ -44,23 +40,27 @@ plugins:
   - serverless-offline
 
 custom:
+  environment:
+    local: ${file(./config/local.env.json)}
+    dev:
+      DB_HOST: ${ssm:/artemis/dev/db/host}
+      DB_USER: ${ssm:/artemis/dev/db/user}
+      DB_PASSWORD: ${ssm:/artemis/dev/db/password}
+      DB_NAME: ${ssm:/artemis/dev/db/name}
+      DB_PORT: ${ssm:/artemis/dev/db/port}
+      JWT_SECRET: ${ssm:/artemis/dev/jwt/secret}
+      FRONTEND_URL: ${ssm:/artemis/dev/frontend/url}
   serverless-offline:
     httpPort: 3000
     host: localhost
     noPrependStageInUrl: true
     allowCache: false
-    corsConfig:
-      origin: '*'
-      headers:
-        - Content-Type
-        - Authorization
-      credentials: false
+    keepAlive: true
+    lambdaTimeout: 60
   httpApi:
     cors:
       allowedOrigins:
-        - ${ssm:/artemis/${self:provider.stage}/frontend/url}
         - http://localhost:5173
-        - http://127.0.0.1:5173
       allowedHeaders:
         - Content-Type
         - Authorization
@@ -68,10 +68,7 @@ custom:
         - GET
         - POST
         - PUT
-        - PATCH
         - DELETE
         - OPTIONS
-      allowCredentials: false
-      maxAge: 86400
   serverlessPluginTypescript:
     tsConfigFileLocation: './tsconfig.json' 

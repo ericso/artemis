@@ -135,6 +135,8 @@ Start the development server with hot reload:
 npm run dev
 ```
 
+The server will start at `http://localhost:3000`.
+
 ### Testing
 
 The project uses Vitest for testing.
@@ -373,3 +375,46 @@ export interface ApiError {
 2. Update `.env.example`
 3. Add type in `src/config/env.ts`
 4. Update documentation
+
+## Local Development Setup
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Configure environment:
+   - Copy `config/local.example.json` to `config/local.env.json`
+   - Update the values in `local.env.json` with your local database credentials and settings
+   - For development environment, copy `config/dev.example.json` to `config/dev.env.json`
+
+3. Start the development server:
+```bash
+npm run dev
+```
+
+The server will start at `http://localhost:3000`.
+
+## Environment Configuration
+
+The application uses different configuration files for different environments:
+
+- `config/local.env.json`: Local development settings (not committed to git)
+- `config/dev.env.json`: Development environment settings (not committed to git)
+- `config/*.example.json`: Example configuration files (committed to git)
+
+Required configuration variables:
+- `DB_HOST`: Database host
+- `DB_USER`: Database user
+- `DB_PASSWORD`: Database password
+- `DB_NAME`: Database name
+- `DB_PORT`: Database port
+- `JWT_SECRET`: Secret for JWT token generation
+- `FRONTEND_URL`: URL of the frontend application
+
+## Available Scripts
+
+- `npm run dev`: Start the development server with hot reload
+- `npm run build`: Build the TypeScript code
+- `npm run test`: Run tests
+- `npm run deploy`: Deploy to AWS (requires AWS credentials)

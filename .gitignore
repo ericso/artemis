@@ -1,26 +1,37 @@
 # Dependencies
 node_modules/
 
-# Build output
+# Testing
+coverage/
+
+# Production & Build
+/build
 dist/
 dist-ssr/
 .serverless/
 .build/
 aws/dist/
 
-# Environment variables
+# Environment & Secrets
 .env
-.env.local
+.env.*
+backend/config/*.env.json
+!backend/config/*.example*.json
+
+# IDE & System
+.DS_Store
+*.tsbuildinfo
+
+# Logs
+npm-debug.log*
+
+# Environment variables
 .env.*
 
 # Logs
 logs
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
 # IDE and editor files
 .idea/
@@ -35,14 +46,8 @@ lerna-debug.log*
 *.sln
 *.sw?
 
-# Test artifacts
-coverage/
-
 # Optional npm cache directory
 .npm
 
 # Optional eslint cache
 .eslintcache
-
-# TypeScript
-*.tsbuildinfo 

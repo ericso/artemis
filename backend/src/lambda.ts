@@ -9,11 +9,11 @@ import serverless from 'serverless-http';
 import app from './app';
 import { Handler, APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
-const handler = serverless(app);
+const serverlessHandler = serverless(app);
 
-export const main: Handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
+export const handler: Handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
   try {
-    const result = await handler(event, context) as APIGatewayProxyResult;
+    const result = await serverlessHandler(event, context) as APIGatewayProxyResult;
     return result;
   } catch (error) {
     console.error('Lambda handler error:', error);
@@ -22,4 +22,7 @@ export const main: Handler = async (event: APIGatewayProxyEvent, context: Contex
       body: JSON.stringify({ message: 'Internal Server Error' })
     };
   }
-}; 
+};
+
+// Also export as main for compatibility
+export const main = handler; 

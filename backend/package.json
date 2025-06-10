@@ -1,7 +1,7 @@
 {
-  "name": "artemis-api",
+  "name": "autostat-api",
   "version": "1.0.0",
-  "description": "Artemis API Server",
+  "description": "AutoStat API Server",
   "main": "dist/lambda.js",
   "scripts": {
     "build": "rm -rf dist && tsc && cp package.json tsconfig.json dist/ && cd dist && npm install --production",

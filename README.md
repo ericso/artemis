@@ -1,4 +1,4 @@
-# Artemis
+# AutoStat
 
 An app that tracks your cars and their mileage.
 
@@ -14,7 +14,7 @@ artemis/
 
 ## Overview
 
-Artemis is split into two main components:
+AutoStat is split into two main components:
 
 - **Backend**: Express.js/TypeScript service handling data and business logic. See [backend/README.md](backend/README.md) for setup and development details.
 - **Frontend**: React application providing the user interface. See [frontend/DEVELOPMENT_NOTES.md](frontend/DEVELOPMENT_NOTES.md) for more information.

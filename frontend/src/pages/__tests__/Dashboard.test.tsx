@@ -57,7 +57,7 @@ describe('Dashboard', () => {
   it('renders dashboard with user info', () => {
     renderDashboard();
     
-    expect(screen.getByText('Artemis')).toBeInTheDocument();
+    expect(screen.getByText('AutoStat')).toBeInTheDocument();
     expect(screen.getByText('test@example.com')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /logout/i })).toBeInTheDocument();
   });
@@ -91,7 +91,7 @@ describe('Dashboard', () => {
     renderDashboard();
     
     // Should still render the basic structure
-    expect(screen.getByText('Artemis')).toBeInTheDocument();
+    expect(screen.getByText('AutoStat')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /logout/i })).toBeInTheDocument();
     // Email should not be displayed
     expect(screen.queryByText(/test@example\.com/)).not.toBeInTheDocument();

@@ -1,4 +1,4 @@
-service: artemis-api
+service: autostat-api
 
 provider:
   name: aws

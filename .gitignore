@@ -16,7 +16,7 @@ aws/dist/
 .env
 .env.*
 backend/config/*.env.json
-!backend/config/*.example.json
+!backend/config/*.example*.json
 
 # IDE & System
 .DS_Store

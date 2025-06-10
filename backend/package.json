@@ -4,7 +4,7 @@
   "description": "Artemis API Server",
   "main": "dist/lambda.js",
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && tsc && cp package.json tsconfig.json dist/ && cd dist && npm install --production",
     "start": "ts-node -r tsconfig-paths/register src/server.ts",
     "dev:express": "nodemon -r tsconfig-paths/register src/server.ts",
     "dev": "serverless offline",

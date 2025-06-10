@@ -39,6 +39,17 @@ export class PostgresUserService implements UserService {
     return this.mapRowToUser(result.rows[0]);
   }
 
+  async findById(id: string): Promise<User | undefined> {
+    const query = 'SELECT * FROM users WHERE id = $1 AND deleted_at IS NULL';
+    const result = await this.db.query<UserRow>(query, [id]);
+    
+    if (result.rows.length === 0) {
+      return undefined;
+    }
+
+    return this.mapRowToUser(result.rows[0]);
+  }
+
   async softDelete(email: string): Promise<void> {
     const query = `
       UPDATE users 

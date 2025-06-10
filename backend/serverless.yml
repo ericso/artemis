@@ -26,6 +26,9 @@ functions:
     handler: dist/lambda.handler
     events:
       - httpApi:
+          path: /health
+          method: GET
+      - httpApi:
           path: /{proxy+}
           method: ANY
     timeout: 30
@@ -33,17 +36,8 @@ functions:
 
 package:
   patterns:
-    - '!node_modules/.prisma/client/libquery_engine-*'
-    - '!node_modules/prisma/libquery_engine-*'
-    - '!node_modules/@prisma/engines/**'
-    - '!tests/**'
-    - '!coverage/**'
-    - '!.env*'
-    - '!tsconfig.json'
-    - '!README.md'
-    - '!jest.config.js'
-    - '!.git/**'
-    - '!.vscode/**'
+    - '!**'
+    - 'dist/**'
 
 plugins:
   - serverless-plugin-typescript

@@ -1,10 +1,12 @@
 import * as dotenv from 'dotenv';
 import path from 'path';
 
-// Load environment variables from .env file
-dotenv.config({
-  path: path.resolve(__dirname, '../../.env')
-});
+// Load environment variables from .env file only in local development
+if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'dev') {
+  dotenv.config({
+    path: path.resolve(__dirname, '../../.env')
+  });
+}
 
 export const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',

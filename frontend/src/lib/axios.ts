@@ -17,7 +17,7 @@ const axiosInstance = axios.create({
     'Accept': 'application/json'
   },
   withCredentials: false,
-  timeout: 10000 // 10 second timeout
+  timeout: 30000 // 30 second timeout
 });
 
 // Add request interceptor to include auth token
@@ -48,7 +48,8 @@ axiosInstance.interceptors.response.use(
           url: error.config?.url,
           method: error.config?.method,
           baseURL: error.config?.baseURL,
-          headers: error.config?.headers
+          headers: error.config?.headers,
+          timeout: error.config?.timeout
         }
       });
     }
@@ -57,6 +58,19 @@ axiosInstance.interceptors.response.use(
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
+
+    // Log timeout errors
+    if (error.code === 'ECONNABORTED') {
+      console.error('Request Timeout Error:', {
+        message: error.message,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          timeout: error.config?.timeout
+        }
+      });
+    }
+
     return Promise.reject(error);
   }
 );

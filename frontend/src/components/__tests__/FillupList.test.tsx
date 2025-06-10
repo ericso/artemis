@@ -57,10 +57,9 @@ describe('FillupList', () => {
     mockConfirm.mockClear();
   });
 
-  it('renders loading state initially', () => {
-    vi.mocked(FillupService.getFillups).mockImplementationOnce(() => 
-      new Promise((resolve) => setTimeout(resolve, 100))
-    );
+  it('renders loading state initially', async () => {
+    const promise = new Promise<Fillup[]>((resolve) => setTimeout(() => resolve([]), 100));
+    vi.mocked(FillupService.getFillups).mockImplementationOnce(() => promise);
 
     render(
       <FillupList
@@ -71,6 +70,7 @@ describe('FillupList', () => {
     );
 
     expect(screen.getByText('Loading fillups...')).toBeInTheDocument();
+    await promise;
   });
 
   it('renders fillups data correctly', async () => {
@@ -155,15 +155,17 @@ describe('FillupList', () => {
     });
 
     const editButtons = screen.getAllByText('Edit');
-    fireEvent.click(editButtons[0]);
+    await fireEvent.click(editButtons[0]);
 
     expect(mockOnEdit).toHaveBeenCalledTimes(1);
     expect(mockOnEdit).toHaveBeenCalledWith(mockFillups[0]);
   });
 
   it('calls onDelete when delete button is clicked and confirmed', async () => {
+    const deletePromise = Promise.resolve();
     vi.mocked(FillupService.getFillups).mockResolvedValueOnce(mockFillups);
     mockConfirm.mockImplementationOnce(() => true);
+    mockOnDelete.mockImplementationOnce(() => deletePromise);
 
     render(
       <FillupList
@@ -183,6 +185,8 @@ describe('FillupList', () => {
     expect(mockConfirm).toHaveBeenCalledWith('Are you sure you want to delete this fillup?');
     expect(mockOnDelete).toHaveBeenCalledTimes(1);
     expect(mockOnDelete).toHaveBeenCalledWith(mockFillups[0]);
+    
+    await deletePromise;
   });
 
   it('does not call onDelete when delete is not confirmed', async () => {
@@ -202,9 +206,9 @@ describe('FillupList', () => {
     });
 
     const deleteButtons = screen.getAllByText('Delete');
-    fireEvent.click(deleteButtons[0]);
+    await fireEvent.click(deleteButtons[0]);
 
-    expect(mockConfirm).toHaveBeenCalled();
+    expect(mockConfirm).toHaveBeenCalledWith('Are you sure you want to delete this fillup?');
     expect(mockOnDelete).not.toHaveBeenCalled();
   });
 }); 

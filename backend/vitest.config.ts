@@ -32,5 +32,5 @@ export default defineConfig({
     },
     silent: true,
     onConsoleLog: () => false
-  }
+  },
 }); 

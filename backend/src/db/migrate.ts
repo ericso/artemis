@@ -4,7 +4,7 @@ import * as createFillupsTable from './migrations/003_create_fillups_table';
 import * as addInitialMileageToCars from './migrations/004_add_initial_mileage_to_cars';
 import * as addSoftDeleteTriggers from './migrations/005_add_soft_delete_triggers';
 import readline from 'readline';
-import { getMigrationConfig } from './migrate-config';
+import { getPool, closePool } from '@config/database';
 import { Pool } from 'pg';
 
 interface Migration {
@@ -75,26 +75,26 @@ async function confirmRollback(environment: string): Promise<boolean> {
   });
 }
 
-async function migrate(direction: 'up' | 'down' = 'up', environment: string = 'local') {
-  const config = getMigrationConfig(environment as 'local' | 'dev');
+async function migrate(direction: 'up' | 'down' = 'up', environment: string = 'local'): Promise<void> {
   console.log(`Running migrations ${direction} in ${environment} environment...`);
   
-  const client = await config.pool.connect();
+  const pool = await getPool(environment);
+  const client = await pool.connect();
   
   try {
     await client.query('BEGIN');
 
     // Always ensure migrations table exists before proceeding
-    await createMigrationsTableIfNotExists(config.pool);
+    await createMigrationsTableIfNotExists(pool);
     
     if (direction === 'up') {
-      const executedMigrations = await getExecutedMigrations(config.pool);
+      const executedMigrations = await getExecutedMigrations(pool);
       
       for (const migration of migrations) {
         if (!executedMigrations.includes(migration.name)) {
           console.log(`Running migration: ${migration.name}`);
-          await migration.up(config.pool);
-          await recordMigration(config.pool, migration.name);
+          await migration.up(pool);
+          await recordMigration(pool, migration.name);
           console.log(`Completed migration: ${migration.name}`);
         } else {
           console.log(`Skipping already executed migration: ${migration.name}`);
@@ -107,14 +107,14 @@ async function migrate(direction: 'up' | 'down' = 'up', environment: string = 'l
         process.exit(0);
       }
 
-      const executedMigrations = await getExecutedMigrations(config.pool);
+      const executedMigrations = await getExecutedMigrations(pool);
       
       // Run migrations in reverse order for rollback
       for (const migration of [...migrations].reverse()) {
         if (executedMigrations.includes(migration.name)) {
           console.log(`Rolling back migration: ${migration.name}`);
-          await migration.down(config.pool);
-          await removeMigration(config.pool, migration.name);
+          await migration.down(pool);
+          await removeMigration(pool, migration.name);
           console.log(`Completed rollback: ${migration.name}`);
         }
       }
@@ -132,7 +132,7 @@ async function migrate(direction: 'up' | 'down' = 'up', environment: string = 'l
     throw error;
   } finally {
     client.release();
-    await config.pool.end();
+    await closePool();
   }
 }
 

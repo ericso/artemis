@@ -1,7 +1,6 @@
 import { Pool } from 'pg';
-import { pool } from '@config/database';
 
-export async function up(db: Pool = pool): Promise<void> {
+export async function up(db: Pool): Promise<void> {
   await db.query(`
     CREATE TABLE IF NOT EXISTS fillups (
       id UUID PRIMARY KEY,
@@ -24,6 +23,6 @@ export async function up(db: Pool = pool): Promise<void> {
   `);
 }
 
-export async function down(db: Pool = pool): Promise<void> {
+export async function down(db: Pool): Promise<void> {
   await db.query('DROP TABLE IF EXISTS fillups CASCADE');
 } 

@@ -1,7 +1,6 @@
 import { Pool } from 'pg';
-import { pool } from '@config/database';
 
-export async function up(db: Pool = pool): Promise<void> {
+export async function up(db: Pool): Promise<void> {
   await db.query(`
     ALTER TABLE cars
     ADD COLUMN initial_mileage INTEGER DEFAULT 0;
@@ -12,7 +11,7 @@ export async function up(db: Pool = pool): Promise<void> {
   `);
 }
 
-export async function down(db: Pool = pool): Promise<void> {
+export async function down(db: Pool): Promise<void> {
   await db.query(`
     ALTER TABLE cars
     DROP COLUMN initial_mileage;

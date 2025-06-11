@@ -1,7 +1,6 @@
 import { Pool } from 'pg';
-import { pool } from '@config/database';
 
-export async function up(db: Pool = pool): Promise<void> {
+export async function up(db: Pool): Promise<void> {
   // Create a function to handle soft delete cascading
   await db.query(`
     CREATE OR REPLACE FUNCTION cascade_soft_delete()
@@ -46,7 +45,7 @@ export async function up(db: Pool = pool): Promise<void> {
   `);
 }
 
-export async function down(db: Pool = pool): Promise<void> {
+export async function down(db: Pool): Promise<void> {
   // Drop triggers
   await db.query('DROP TRIGGER IF EXISTS users_soft_delete_trigger ON users;');
   await db.query('DROP TRIGGER IF EXISTS cars_soft_delete_trigger ON cars;');

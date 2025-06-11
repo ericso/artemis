@@ -32,17 +32,14 @@ Each component (backend/frontend) has its own development workflow and requireme
 
 ### Backend Deployment
 
-The backend is deployed as an AWS Lambda function using the Serverless Framework. Key deployment files:
+The backend is deployed as an AWS Lambda function using the [Serverless Framework](www.serverless.com). Key deployment files:
 
 - `backend/serverless.yml` - Serverless Framework configuration
-- `backend/lambda.ts` - Lambda handler with CORS configuration
+- `backend/src/lambda.ts` - Lambda handler with CORS configuration
 - `aws/lambda-vpc-policy.json` - VPC access policy for Lambda
 - `aws/lambda-role-trust-policy.json` - IAM role trust policy
 
 To deploy the backend:
-
-1. Configure AWS credentials
-2. Run the deployment:
 ```bash
 cd backend
 npm run deploy
@@ -52,10 +49,10 @@ npm run deploy
 
 The frontend is built as a static site using Vite. The build output in `frontend/dist` can be deployed to any static hosting service.
 
-To build the frontend for production:
+To deploy the frontend:
 ```bash
 cd frontend
-npm run build
+npm run deploy
 ```
 
 ### AWS Infrastructure
@@ -91,3 +88,28 @@ Required environment variables for production deployment:
 ### Frontend
 Required environment variables for production build:
 - `VITE_API_URL` - Backend API URL
+
+This URL is provided by the deploy script for the backend. It is provided at `frontend/.env.production`.
+
+### AWS Parameter Store
+The environment variables are provided by the AWS Parameter Store. To update these values from the command line, execute the following commands:
+```bash
+aws ssm put-parameter --name "/autostat/dev/db/host" --value "VALUE" --type "SecureString" --overwrite
+aws ssm put-parameter --name "/autostat/dev/db/user" --value "VALUE" --type "SecureString" --overwrite
+aws ssm put-parameter --name "/autostat/dev/db/password" --value "VALUE" --type "SecureString" --overwrite
+aws ssm put-parameter --name "/autostat/dev/db/name" --value "VALUE" --type "SecureString" --overwrite
+aws ssm put-parameter --name "/autostat/dev/db/port" --value "VALUE" --type "SecureString" --overwrite
+
+aws ssm put-parameter --name "/autostat/dev/jwt/secret" --value "VALUE" --type "SecureString" --overwrite
+aws ssm put-parameter --name "/autostat/dev/frontend/url" --value "VALUE" --type "SecureString" --overwrite
+```
+
+The `/autostat/dev/frontend/url` is the URL from which the static asset frontend is served.
+
+### Security Group ID and Subnet IDs
+Additionally, AWS has security group and subnets setup. These are the parameter store keys for setting these values.
+```bash
+aws ssm put-parameter --name "/autostat/dev/vpc/securityGroupId" --value "VALUE" --type "SecureString" --overwrite
+aws ssm put-parameter --name "/autostat/dev/vpc/subnetId1" --value "VALUE" --type "SecureString" --overwrite
+aws ssm put-parameter --name "/autostat/dev/vpc/subnetId2" --value "VALUE" --type "SecureString" --overwrite
+```

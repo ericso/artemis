@@ -76,7 +76,7 @@ async function confirmRollback(environment: string): Promise<boolean> {
 }
 
 async function migrate(direction: 'up' | 'down' = 'up', environment: string = 'local') {
-  const config = getMigrationConfig(environment as 'local' | 'dev' | 'prod');
+  const config = getMigrationConfig(environment as 'local' | 'dev');
   console.log(`Running migrations ${direction} in ${environment} environment...`);
   
   const client = await config.pool.connect();

@@ -1,7 +1,7 @@
-import { Pool } from 'pg';
+import { PoolClient } from 'pg';
 
-export async function up(db: Pool): Promise<void> {
-  await db.query(`
+export async function up(client: PoolClient): Promise<void> {
+  await client.query(`
     CREATE TABLE IF NOT EXISTS fillups (
       id UUID PRIMARY KEY,
       car_id UUID NOT NULL,
@@ -18,11 +18,11 @@ export async function up(db: Pool): Promise<void> {
     )
   `);
   
-  await db.query(`
+  await client.query(`
     COMMENT ON TABLE fillups IS 'Records of vehicle gas fill-up events';
   `);
 }
 
-export async function down(db: Pool): Promise<void> {
-  await db.query('DROP TABLE IF EXISTS fillups CASCADE');
+export async function down(client: PoolClient): Promise<void> {
+  await client.query('DROP TABLE IF EXISTS fillups CASCADE');
 } 

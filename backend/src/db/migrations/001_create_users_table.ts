@@ -1,7 +1,7 @@
-import { Pool } from 'pg';
+import { PoolClient } from 'pg';
 
-export async function up(db: Pool): Promise<void> {
-  await db.query(`
+export async function up(client: PoolClient): Promise<void> {
+  await client.query(`
     CREATE TABLE IF NOT EXISTS users (
       id UUID PRIMARY KEY,
       email VARCHAR UNIQUE NOT NULL,
@@ -13,6 +13,6 @@ export async function up(db: Pool): Promise<void> {
   `);
 }
 
-export async function down(db: Pool): Promise<void> {
-  await db.query('DROP TABLE IF EXISTS users CASCADE');
+export async function down(client: PoolClient): Promise<void> {
+  await client.query('DROP TABLE IF EXISTS users CASCADE');
 } 

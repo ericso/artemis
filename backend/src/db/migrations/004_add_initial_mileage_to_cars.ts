@@ -1,18 +1,18 @@
-import { Pool } from 'pg';
+import { PoolClient } from 'pg';
 
-export async function up(db: Pool): Promise<void> {
-  await db.query(`
+export async function up(client: PoolClient): Promise<void> {
+  await client.query(`
     ALTER TABLE cars
     ADD COLUMN initial_mileage INTEGER DEFAULT 0;
   `);
   
-  await db.query(`
+  await client.query(`
     COMMENT ON COLUMN cars.initial_mileage IS 'Initial odometer reading when the car was added to the system'
   `);
 }
 
-export async function down(db: Pool): Promise<void> {
-  await db.query(`
+export async function down(client: PoolClient): Promise<void> {
+  await client.query(`
     ALTER TABLE cars
     DROP COLUMN initial_mileage;
   `);

@@ -47,7 +47,28 @@ async function resolveSSMParameter(paramRef: string): Promise<string> {
 async function loadConfig(environment: string = 'local'): Promise<EnvConfig> {
   console.log('Loading config for environment:', environment);
   
-  const configPath = resolve(__dirname, `../../config/${environment}.env.json`);
+  // If all required environment variables are set, use them directly
+  if (process.env.DB_HOST && 
+      process.env.DB_USER && 
+      process.env.DB_PASSWORD && 
+      process.env.DB_NAME && 
+      process.env.DB_PORT && 
+      process.env.JWT_SECRET && 
+      process.env.FRONTEND_URL) {
+    console.log('Using environment variables for configuration');
+    return {
+      DB_HOST: process.env.DB_HOST,
+      DB_USER: process.env.DB_USER,
+      DB_PASSWORD: process.env.DB_PASSWORD,
+      DB_NAME: process.env.DB_NAME,
+      DB_PORT: process.env.DB_PORT,
+      JWT_SECRET: process.env.JWT_SECRET,
+      FRONTEND_URL: process.env.FRONTEND_URL
+    };
+  }
+  
+  // Otherwise, load from config file
+  const configPath = resolve(process.env.CONFIG_PATH || __dirname, `../../config/${environment}.env.json`);
   try {
     console.log(`Loading config from: ${configPath}`);
     const rawConfig = JSON.parse(readFileSync(configPath, 'utf-8'));
@@ -58,6 +79,7 @@ async function loadConfig(environment: string = 'local'): Promise<EnvConfig> {
     });
     
     // Resolve all SSM parameters
+    console.log('Resolving configuration values...');
     const resolvedConfig: EnvConfig = {
       DB_HOST: await resolveSSMParameter(rawConfig.DB_HOST),
       DB_USER: await resolveSSMParameter(rawConfig.DB_USER),
@@ -67,6 +89,12 @@ async function loadConfig(environment: string = 'local'): Promise<EnvConfig> {
       JWT_SECRET: await resolveSSMParameter(rawConfig.JWT_SECRET),
       FRONTEND_URL: await resolveSSMParameter(rawConfig.FRONTEND_URL),
     };
+
+    console.log('Resolved configuration:', {
+      ...resolvedConfig,
+      DB_PASSWORD: '******',
+      JWT_SECRET: '******'
+    });
 
     return resolvedConfig;
   } catch (error) {

@@ -1,8 +1,8 @@
-import { Pool } from 'pg';
+import { PoolClient } from 'pg';
 
-export async function up(db: Pool): Promise<void> {
-  // Create a function to handle soft delete cascading
-  await db.query(`
+export async function up(client: PoolClient): Promise<void> {
+  // Create function to update updated_at timestamp
+  await client.query(`
     CREATE OR REPLACE FUNCTION cascade_soft_delete()
     RETURNS TRIGGER AS $$
     BEGIN
@@ -28,16 +28,15 @@ export async function up(db: Pool): Promise<void> {
     $$ LANGUAGE plpgsql;
   `);
 
-  // Create trigger for users table
-  await db.query(`
+  // Create triggers for each table
+  await client.query(`
     CREATE TRIGGER users_soft_delete_trigger
     AFTER UPDATE ON users
     FOR EACH ROW
     EXECUTE FUNCTION cascade_soft_delete();
   `);
 
-  // Create trigger for cars table
-  await db.query(`
+  await client.query(`
     CREATE TRIGGER cars_soft_delete_trigger
     AFTER UPDATE ON cars
     FOR EACH ROW
@@ -45,11 +44,11 @@ export async function up(db: Pool): Promise<void> {
   `);
 }
 
-export async function down(db: Pool): Promise<void> {
+export async function down(client: PoolClient): Promise<void> {
   // Drop triggers
-  await db.query('DROP TRIGGER IF EXISTS users_soft_delete_trigger ON users;');
-  await db.query('DROP TRIGGER IF EXISTS cars_soft_delete_trigger ON cars;');
-  
+  await client.query('DROP TRIGGER IF EXISTS users_soft_delete_trigger ON users;');
+  await client.query('DROP TRIGGER IF EXISTS cars_soft_delete_trigger ON cars;');
+
   // Drop function
-  await db.query('DROP FUNCTION IF EXISTS cascade_soft_delete;');
+  await client.query('DROP FUNCTION IF EXISTS cascade_soft_delete;');
 } 

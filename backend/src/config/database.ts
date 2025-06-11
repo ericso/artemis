@@ -1,73 +1,118 @@
-import { Pool } from 'pg';
+import { Pool, PoolConfig } from 'pg';
 import { env, getConfig } from './env';
+import * as net from 'net';
 
 // Initialize pool
 let pool: Pool | null = null;
 
-export async function getPool(environment?: string): Promise<Pool> {
+async function testTcpConnection(host: string, port: number): Promise<void> {
+  console.log(`Testing TCP connection to ${host}:${port}...`);
+  return new Promise((resolve, reject) => {
+    const socket = new net.Socket();
+    
+    socket.setTimeout(5000); // 5 seconds timeout
+    
+    socket.on('connect', () => {
+      console.log('TCP connection successful');
+      socket.destroy();
+      resolve();
+    });
+    
+    socket.on('timeout', () => {
+      socket.destroy();
+      reject(new Error(`Cannot establish TCP connection to ${host}:${port}. Please check if:\n1. The host and port are correct\n2. The database is running\n3. Any firewalls or security groups allow the connection\n4. You have network connectivity to the host`));
+    });
+    
+    socket.on('error', (error) => {
+      socket.destroy();
+      reject(error);
+    });
+    
+    socket.connect(port, host);
+  });
+}
+
+async function getPool(environment: string = 'local'): Promise<Pool> {
   if (pool) {
     return pool;
   }
-
-  // Ensure config is loaded
+  
+  console.log(`Loading config for environment: ${environment}`);
   await getConfig(environment);
   
-  const config = {
+  console.log('Using environment variables for configuration');
+  
+  const poolConfig: PoolConfig = {
     user: env.DB.USER,
     host: env.DB.HOST,
     database: env.DB.NAME,
     password: env.DB.PASSWORD,
     port: env.DB.PORT,
+    max: 1, // Use a single connection for migrations
+    idleTimeoutMillis: 300000, // 5 minutes
+    connectionTimeoutMillis: 60000, // 60 seconds
+    ssl: {
+      rejectUnauthorized: false // Allow self-signed certificates
+    }
   };
-
-  if (env.NODE_ENV === 'local') {
-    // Local development configuration
-    Object.assign(config, {
-      max: 10,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 5000,
-    });
-  } else if (env.NODE_ENV === 'dev') {
-    // Dev environment configuration
-    Object.assign(config, {
-      max: 1,
-      idleTimeoutMillis: 120000,
-      connectionTimeoutMillis: 10000,
-      ssl: false
-    });
-  } else {
-    // Production configuration
-    Object.assign(config, {
-      max: 1,
-      idleTimeoutMillis: 120000,
-      connectionTimeoutMillis: 10000,
-      ssl: {
-        rejectUnauthorized: false
-      }
-    });
+  
+  console.log('Database connection config:', {
+    ...poolConfig,
+    password: '******'
+  });
+  
+  // Test TCP connectivity first
+  const host = poolConfig.host;
+  const port = poolConfig.port;
+  if (!host || !port) {
+    throw new Error('Database host and port must be defined');
   }
+  await testTcpConnection(host, port);
   
-  // Log connection details (excluding password)
-  console.log('Attempting database connection with:', {
-    ...config,
-    password: '******',
+  console.log('Attempting to connect to database...');
+  pool = new Pool(poolConfig);
+  
+  // Add event handlers for debugging
+  pool.on('connect', () => {
+    console.log('New client connected to the database');
   });
   
-  pool = new Pool(config);
-
-  // Handle pool errors
+  pool.on('acquire', () => {
+    console.log('Client acquired from pool');
+  });
+  
+  pool.on('remove', () => {
+    console.log('Client removed from pool');
+  });
+  
   pool.on('error', (err) => {
-    console.error('Unexpected error on idle client', err);
-    process.exit(-1);
+    console.error('Unexpected error on idle client:', err);
   });
-
-  return pool;
+  
+  // Test the connection
+  console.log('Testing database connection...');
+  try {
+    const client = await pool.connect();
+    console.log('Client connected successfully');
+    const result = await client.query('SELECT NOW()');
+    console.log('Database connection successful:', result.rows[0].now);
+    client.release();
+    return pool;
+  } catch (error) {
+    console.error('Failed to connect to database:', error);
+    await closePool();
+    throw error;
+  }
 }
 
 // Export a function to close the pool
-export async function closePool(): Promise<void> {
+async function closePool(): Promise<void> {
   if (pool) {
+    console.log('Closing database connection pool...');
     await pool.end();
     pool = null;
+    console.log('Database connection pool closed');
   }
-} 
+}
+
+export { getPool, closePool }; 

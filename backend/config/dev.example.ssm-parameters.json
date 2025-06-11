@@ -1,9 +1,9 @@
 {
-  "DB_HOST": "ssm:/artemis/dev/db/host",
-  "DB_USER": "ssm:/artemis/dev/db/user",
-  "DB_PASSWORD": "ssm:/artemis/dev/db/password",
-  "DB_NAME": "ssm:/artemis/dev/db/name",
-  "DB_PORT": "ssm:/artemis/dev/db/port",
-  "JWT_SECRET": "ssm:/artemis/dev/jwt/secret",
-  "FRONTEND_URL": "ssm:/artemis/dev/frontend/url"
+  "DB_HOST": "ssm:/autostat/dev/db/host",
+  "DB_USER": "ssm:/autostat/dev/db/user",
+  "DB_PASSWORD": "ssm:/autostat/dev/db/password",
+  "DB_NAME": "ssm:/autostat/dev/db/name",
+  "DB_PORT": "ssm:/autostat/dev/db/port",
+  "JWT_SECRET": "ssm:/autostat/dev/jwt/secret",
+  "FRONTEND_URL": "ssm:/autostat/dev/frontend/url"
 } 

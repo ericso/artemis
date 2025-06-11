@@ -3,7 +3,7 @@ service: autostat-api
 provider:
   name: aws
   runtime: nodejs18.x
-  stage: ${opt:stage, 'local'}
+  stage: ${opt:stage, 'dev'}
   region: us-east-1
   environment:
     NODE_ENV: ${self:provider.stage}
@@ -14,6 +14,29 @@ provider:
     DB_PORT: ${self:custom.environment.${self:provider.stage}.DB_PORT}
     JWT_SECRET: ${self:custom.environment.${self:provider.stage}.JWT_SECRET}
     FRONTEND_URL: ${self:custom.environment.${self:provider.stage}.FRONTEND_URL}
+  vpc:
+    securityGroupIds:
+      - ${ssm:'/autostat/dev/vpc/securityGroupId'}
+    subnetIds:
+      - ${ssm:'/autostat/dev/vpc/subnetId1'}
+      - ${ssm:'/autostat/dev/vpc/subnetId2'}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - ssm:GetParameter
+            - ssm:GetParameters
+          Resource: 
+            - arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/autostat/*
+        - Effect: Allow
+          Action:
+            - ec2:CreateNetworkInterface
+            - ec2:DescribeNetworkInterfaces
+            - ec2:DeleteNetworkInterface
+            - ec2:AssignPrivateIpAddresses
+            - ec2:UnassignPrivateIpAddresses
+          Resource: "*"
 
 functions:
   api:
@@ -22,11 +45,29 @@ functions:
       - http:
           path: /health
           method: GET
-          cors: true
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: true
       - http:
           path: /{proxy+}
           method: ANY
-          cors: true
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: true
     timeout: 60
     memorySize: 1024
 
@@ -43,13 +84,13 @@ custom:
   environment:
     local: ${file(./config/local.env.json)}
     dev:
-      DB_HOST: ${ssm:/artemis/dev/db/host}
-      DB_USER: ${ssm:/artemis/dev/db/user}
-      DB_PASSWORD: ${ssm:/artemis/dev/db/password}
-      DB_NAME: ${ssm:/artemis/dev/db/name}
-      DB_PORT: ${ssm:/artemis/dev/db/port}
-      JWT_SECRET: ${ssm:/artemis/dev/jwt/secret}
-      FRONTEND_URL: ${ssm:/artemis/dev/frontend/url}
+      DB_HOST: ${ssm:'/autostat/dev/db/host'}
+      DB_USER: ${ssm:'/autostat/dev/db/user'}
+      DB_PASSWORD: ${ssm:'/autostat/dev/db/password'}
+      DB_NAME: ${ssm:'/autostat/dev/db/name'}
+      DB_PORT: ${ssm:'/autostat/dev/db/port'}
+      JWT_SECRET: ${ssm:'/autostat/dev/jwt/secret'}
+      FRONTEND_URL: ${ssm:'/autostat/dev/frontend/url'}
   serverless-offline:
     httpPort: 3000
     host: localhost
@@ -57,18 +98,18 @@ custom:
     allowCache: false
     keepAlive: true
     lambdaTimeout: 60
-  httpApi:
-    cors:
-      allowedOrigins:
-        - http://localhost:5173
-      allowedHeaders:
-        - Content-Type
-        - Authorization
-      allowedMethods:
-        - GET
-        - POST
-        - PUT
-        - DELETE
-        - OPTIONS
+  cors:
+    origins:
+      - http://localhost:5173
+      - http://autostat-frontend-dev.s3-website-us-east-1.amazonaws.com
+    headers:
+      - Content-Type
+      - Authorization
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - OPTIONS
   serverlessPluginTypescript:
     tsConfigFileLocation: './tsconfig.json' 

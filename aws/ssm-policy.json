@@ -7,7 +7,7 @@
                 "ssm:GetParameter",
                 "ssm:GetParameters"
             ],
-            "Resource": "arn:aws:ssm:*:*:parameter/artemis/*"
+            "Resource": "arn:aws:ssm:*:*:parameter/autostat/*"
         }
     ]
 }

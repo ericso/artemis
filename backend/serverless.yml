@@ -1,4 +1,4 @@
-service: autostat-api
+service: autostat
 
 provider:
   name: aws

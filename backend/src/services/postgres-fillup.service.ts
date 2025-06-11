@@ -18,7 +18,7 @@ interface FillupRow {
 }
 
 export class PostgresFillupService implements FillupService {
-  constructor(private db: Pool = pool) {}
+  constructor(private db: Pool = pool!) {}
 
   async findById(id: string): Promise<Fillup | undefined> {
     const query = 'SELECT * FROM fillups WHERE id = $1 AND deleted_at IS NULL';

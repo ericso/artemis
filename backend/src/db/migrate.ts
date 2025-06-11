@@ -5,7 +5,7 @@ import * as addInitialMileageToCars from './migrations/004_add_initial_mileage_t
 import * as addSoftDeleteTriggers from './migrations/005_add_soft_delete_triggers';
 import readline from 'readline';
 import { getPool, closePool } from '@config/database';
-import { Pool, PoolClient } from 'pg';
+import { PoolClient } from 'pg';
 
 interface Migration {
   name: string;
@@ -21,17 +21,6 @@ const migrations: Migration[] = [
   { name: '005_add_soft_delete_triggers', ...addSoftDeleteTriggers },
 ];
 
-async function testConnection(client: PoolClient): Promise<void> {
-  console.log('Testing database connection...');
-  try {
-    const result = await client.query('SELECT NOW()');
-    console.log('Database connection successful:', result.rows[0].now);
-  } catch (error) {
-    console.error('Failed to connect to database:', error);
-    throw error;
-  }
-}
-
 async function createMigrationsTableIfNotExists(client: PoolClient): Promise<void> {
   await client.query(`
     CREATE TABLE IF NOT EXISTS migrations (
@@ -43,13 +32,8 @@ async function createMigrationsTableIfNotExists(client: PoolClient): Promise<voi
 }
 
 async function getExecutedMigrations(client: PoolClient): Promise<string[]> {
-  try {
-    const result = await client.query('SELECT name FROM migrations ORDER BY id');
-    return result.rows.map(row => row.name);
-  } catch (error) {
-    // If migrations table doesn't exist yet, return empty array
-    return [];
-  }
+  const result = await client.query('SELECT name FROM migrations ORDER BY id');
+  return result.rows.map(row => row.name);
 }
 
 async function recordMigration(client: PoolClient, name: string): Promise<void> {
@@ -57,18 +41,11 @@ async function recordMigration(client: PoolClient, name: string): Promise<void> 
 }
 
 async function removeMigration(client: PoolClient, name: string): Promise<void> {
-  try {
-    await client.query('DELETE FROM migrations WHERE name = $1', [name]);
-  } catch (error) {
-    // If migrations table doesn't exist, that's fine - we're rolling back anyway
-    console.log('Note: migrations table not found during rollback');
-  }
+  await client.query('DELETE FROM migrations WHERE name = $1', [name]);
 }
 
 async function confirmRollback(environment: string): Promise<boolean> {
-  // Skip confirmation in non-interactive environments (e.g. Lambda)
   if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
-    console.log('Running in Lambda environment, skipping rollback confirmation');
     return true;
   }
 
@@ -93,18 +70,11 @@ async function confirmRollback(environment: string): Promise<boolean> {
 }
 
 async function migrate(direction: 'up' | 'down' = 'up', environment: string = 'local'): Promise<void> {
-  console.log(`Running migrations ${direction} in ${environment} environment...`);
-  
   const pool = await getPool(environment);
   const client = await pool.connect();
   
   try {
-    // Test connection before proceeding
-    await testConnection(client);
-    
     await client.query('BEGIN');
-
-    // Always ensure migrations table exists before proceeding
     await createMigrationsTableIfNotExists(client);
     
     if (direction === 'up') {
@@ -112,12 +82,8 @@ async function migrate(direction: 'up' | 'down' = 'up', environment: string = 'l
       
       for (const migration of migrations) {
         if (!executedMigrations.includes(migration.name)) {
-          console.log(`Running migration: ${migration.name}`);
           await migration.up(client);
           await recordMigration(client, migration.name);
-          console.log(`Completed migration: ${migration.name}`);
-        } else {
-          console.log(`Skipping already executed migration: ${migration.name}`);
         }
       }
     } else {
@@ -129,26 +95,19 @@ async function migrate(direction: 'up' | 'down' = 'up', environment: string = 'l
 
       const executedMigrations = await getExecutedMigrations(client);
       
-      // Run migrations in reverse order for rollback
       for (const migration of [...migrations].reverse()) {
         if (executedMigrations.includes(migration.name)) {
-          console.log(`Rolling back migration: ${migration.name}`);
           await migration.down(client);
           await removeMigration(client, migration.name);
-          console.log(`Completed rollback: ${migration.name}`);
         }
       }
 
-      // Finally, drop the migrations table itself
-      console.log('Dropping migrations table');
       await client.query('DROP TABLE IF EXISTS migrations CASCADE');
     }
 
     await client.query('COMMIT');
-    console.log(`Migrations ${direction === 'up' ? 'completed' : 'rolled back'} successfully`);
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error(`Migration ${direction} failed:`, error);
     throw error;
   } finally {
     client.release();
@@ -156,11 +115,9 @@ async function migrate(direction: 'up' | 'down' = 'up', environment: string = 'l
   }
 }
 
-// Get the migration direction and environment from command line arguments
 const direction = process.argv[2] as 'up' | 'down' | undefined;
 const environment = process.argv[3] || 'local';
 
-// Only run migrations directly if this file is being executed directly
 if (require.main === module) {
   migrate(direction, environment).catch(console.error);
 }

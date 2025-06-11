@@ -1,155 +1,69 @@
-import { resolve } from 'path';
-import { readFileSync } from 'fs';
 import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
 
+interface DBConfig {
+  HOST: string;
+  PORT: number;
+  NAME: string;
+  USER: string;
+  PASSWORD: string;
+}
+
+interface JWTConfig {
+  SECRET: string;
+  EXPIRES_IN: string;
+}
+
 interface EnvConfig {
-  DB_HOST: string;
-  DB_USER: string;
-  DB_PASSWORD: string;
-  DB_NAME: string;
-  DB_PORT: string;
-  JWT_SECRET: string;
-  FRONTEND_URL: string;
+  DB: DBConfig;
+  JWT: JWTConfig;
+  NODE_ENV: string;
+  PORT: number;
 }
 
-const ssmClient = new SSMClient({ region: process.env.AWS_REGION || 'us-east-1' });
-
-async function resolveSSMParameter(paramRef: string): Promise<string> {
-  // Extract the actual parameter name from the reference
-  // e.g. "${ssm:/artemis/dev/db/host}" -> "/artemis/dev/db/host"
-  const paramName = paramRef.match(/\${ssm:([^}]+)}/)?.[1];
-  if (!paramName) {
-    return paramRef; // Return as-is if not an SSM reference
-  }
-
-  try {
-    console.log(`Resolving SSM parameter: ${paramName}`);
-    const command = new GetParameterCommand({
-      Name: paramName,
-      WithDecryption: true,
-    });
-    const response = await ssmClient.send(command);
-    const value = response.Parameter?.Value || paramRef;
-    console.log(`Resolved ${paramName} to: ${paramName.includes('password') ? '******' : value}`);
-    return value;
-  } catch (error) {
-    console.log(`SSM parameter ${paramName} not found, using value from config file`);
-    // If SSM parameter doesn't exist, extract and return the default value if present
-    const defaultValue = paramRef.match(/\${ssm:[^}]+,\s*default=([^}]+)}/)?.[1];
-    if (defaultValue) {
-      return defaultValue;
-    }
-    // If no default value, return the raw value from the config file
-    return paramRef.replace(/\${ssm:[^}]+}/, '');
-  }
-}
-
-async function loadConfig(environment: string = 'local'): Promise<EnvConfig> {
-  console.log('Loading config for environment:', environment);
-  
-  // If all required environment variables are set, use them directly
-  if (process.env.DB_HOST && 
-      process.env.DB_USER && 
-      process.env.DB_PASSWORD && 
-      process.env.DB_NAME && 
-      process.env.DB_PORT && 
-      process.env.JWT_SECRET && 
-      process.env.FRONTEND_URL) {
-    console.log('Using environment variables for configuration');
-    return {
-      DB_HOST: process.env.DB_HOST,
-      DB_USER: process.env.DB_USER,
-      DB_PASSWORD: process.env.DB_PASSWORD,
-      DB_NAME: process.env.DB_NAME,
-      DB_PORT: process.env.DB_PORT,
-      JWT_SECRET: process.env.JWT_SECRET,
-      FRONTEND_URL: process.env.FRONTEND_URL
-    };
-  }
-  
-  // Otherwise, load from config file
-  const configPath = resolve(process.env.CONFIG_PATH || __dirname, `../../config/${environment}.env.json`);
-  try {
-    console.log(`Loading config from: ${configPath}`);
-    const rawConfig = JSON.parse(readFileSync(configPath, 'utf-8'));
-    console.log('Raw config loaded:', {
-      ...rawConfig,
-      DB_PASSWORD: '******',
-      JWT_SECRET: '******'
-    });
-    
-    // Resolve all SSM parameters
-    console.log('Resolving configuration values...');
-    const resolvedConfig: EnvConfig = {
-      DB_HOST: await resolveSSMParameter(rawConfig.DB_HOST),
-      DB_USER: await resolveSSMParameter(rawConfig.DB_USER),
-      DB_PASSWORD: await resolveSSMParameter(rawConfig.DB_PASSWORD),
-      DB_NAME: await resolveSSMParameter(rawConfig.DB_NAME),
-      DB_PORT: await resolveSSMParameter(rawConfig.DB_PORT),
-      JWT_SECRET: await resolveSSMParameter(rawConfig.JWT_SECRET),
-      FRONTEND_URL: await resolveSSMParameter(rawConfig.FRONTEND_URL),
-    };
-
-    console.log('Resolved configuration:', {
-      ...resolvedConfig,
-      DB_PASSWORD: '******',
-      JWT_SECRET: '******'
-    });
-
-    return resolvedConfig;
-  } catch (error) {
-    console.error(`Failed to load config for ${environment} environment`);
-    console.error(`Make sure ${configPath} exists and is properly formatted`);
-    console.error(`You can copy ${environment}.example.json to ${environment}.env.json and update the values`);
-    throw error;
-  }
-}
-
-// Initialize config
-let configPromise: Promise<EnvConfig>;
-let cachedConfig: EnvConfig | null = null;
-let currentEnvironment: string | null = null;
-
-async function getConfig(environment?: string): Promise<EnvConfig> {
-  if (cachedConfig && environment === currentEnvironment) {
-    return cachedConfig;
-  }
-  
-  currentEnvironment = environment || 'local';
-  configPromise = loadConfig(currentEnvironment);
-  cachedConfig = await configPromise;
-  return cachedConfig;
-}
-
-// Export the config getter
-export const env = {
-  get DB() {
-    if (!cachedConfig) {
-      throw new Error('Configuration not loaded. Call await getConfig() first.');
-    }
-    return {
-      USER: cachedConfig.DB_USER,
-      HOST: cachedConfig.DB_HOST,
-      NAME: cachedConfig.DB_NAME,
-      PASSWORD: cachedConfig.DB_PASSWORD,
-      PORT: parseInt(cachedConfig.DB_PORT),
-    };
+export const env: EnvConfig = {
+  DB: {
+    HOST: '',
+    PORT: 5432,
+    NAME: '',
+    USER: '',
+    PASSWORD: ''
   },
-  get JWT_SECRET() {
-    if (!cachedConfig) {
-      throw new Error('Configuration not loaded. Call await getConfig() first.');
-    }
-    return cachedConfig.JWT_SECRET;
+  JWT: {
+    SECRET: process.env.JWT_SECRET || 'default-dev-secret',
+    EXPIRES_IN: process.env.JWT_EXPIRES_IN || '1d'
   },
-  get FRONTEND_URL() {
-    if (!cachedConfig) {
-      throw new Error('Configuration not loaded. Call await getConfig() first.');
-    }
-    return cachedConfig.FRONTEND_URL;
-  },
-  get NODE_ENV() {
-    return currentEnvironment || 'local';
-  }
+  NODE_ENV: process.env.NODE_ENV || 'development',
+  PORT: parseInt(process.env.PORT || '3000')
 };
 
-export { getConfig };
+const ssmClient = new SSMClient({});
+
+async function getSSMParameter(parameterName: string): Promise<string> {
+  const command = new GetParameterCommand({
+    Name: parameterName,
+    WithDecryption: true
+  });
+
+  const response = await ssmClient.send(command);
+  if (!response.Parameter?.Value) {
+    throw new Error(`Parameter ${parameterName} not found`);
+  }
+
+  return response.Parameter.Value;
+}
+
+export async function getConfig(environment: string): Promise<void> {
+  const dbHost = await getSSMParameter(`/autostat/${environment}/db/host`);
+  const dbPort = await getSSMParameter(`/autostat/${environment}/db/port`);
+  const dbName = await getSSMParameter(`/autostat/${environment}/db/name`);
+  const dbUser = await getSSMParameter(`/autostat/${environment}/db/username`);
+  const dbPassword = await getSSMParameter(`/autostat/${environment}/db/password`);
+
+  env.DB = {
+    HOST: dbHost,
+    PORT: parseInt(dbPort),
+    NAME: dbName,
+    USER: dbUser,
+    PASSWORD: dbPassword
+  };
+}

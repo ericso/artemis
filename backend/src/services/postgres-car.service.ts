@@ -18,7 +18,7 @@ interface CarRow {
 }
 
 export class PostgresCarService implements CarService {
-  constructor(private db: Pool = pool) {}
+  constructor(private db: Pool = pool!) {}
 
   async findById(id: string): Promise<Car | undefined> {
     const query = 'SELECT * FROM cars WHERE id = $1 AND deleted_at IS NULL';

@@ -13,7 +13,7 @@ interface UserRow {
 }
 
 export class PostgresUserService implements UserService {
-  constructor(private db: Pool = pool) {}
+  constructor(private db: Pool = pool!) {}
 
   async findByEmail(email: string): Promise<User | undefined> {
     const query = 'SELECT * FROM users WHERE email = $1 AND deleted_at IS NULL';

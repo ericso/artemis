@@ -20,7 +20,9 @@ const shutdown = async () => {
 
   try {
     // Close database pool
-    await pool.end();
+    if (pool) {
+      await pool.end();
+    }
     console.log('Database pool closed');
     
     // Exit process
@@ -32,7 +34,16 @@ const shutdown = async () => {
 };
 
 // Handle termination signals
-process.on('SIGTERM', shutdown);
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM signal received.');
+  server.close(() => {
+    console.log('Server closed.');
+  });
+  if (pool) {
+    await pool.end();
+  }
+  process.exit(0);
+});
 process.on('SIGINT', shutdown);
 
 // Handle uncaught errors

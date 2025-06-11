@@ -12,7 +12,8 @@ interface EnvConfig {
 }
 
 function loadConfig(): EnvConfig {
-  const environment = process.env.NODE_ENV === 'development' ? 'dev' : 'local';
+  const environment = process.env.NODE_ENV === 'test' ? 'test' : 
+                     process.env.NODE_ENV === 'development' ? 'dev' : 'local';
   
   const configPath = resolve(__dirname, `../../config/${environment}.env.json`);
   try {

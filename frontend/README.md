@@ -182,6 +182,31 @@ npm run build
 
 The build output will be in the `dist` directory, ready for deployment to any static file server.
 
+### CloudFront Deployment
+
+The frontend is deployed to AWS CloudFront with a custom domain (autostat.app). The deployment process:
+
+1. Builds the production assets
+2. Syncs the assets to S3
+3. Invalidates the CloudFront cache
+
+Required environment variables for deployment:
+- `CLOUDFRONT_DISTRIBUTION_ID`: The ID of the CloudFront distribution
+
+These variables are managed in `frontend/.env.cloudfront` which is created by the `scripts/setup-cloudfront-env.sh` script.
+
+To deploy:
+```bash
+# Load CloudFront environment variables
+source frontend/.env.cloudfront
+
+# Deploy to dev environment
+npm run deploy
+
+# Deploy to production environment
+npm run deploy:prod
+```
+
 ### Environment Configuration
 
 Required environment variables:
@@ -189,3 +214,5 @@ Required environment variables:
 
 For development-specific configuration, create a `.env.development` file.
 For production, use `.env.production`.
+
+The app the following URL: https://autostat.app

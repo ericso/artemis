@@ -78,9 +78,18 @@ package:
 
 plugins:
   - serverless-plugin-typescript
-  - serverless-offline
+  - serverless-domain-manager
 
 custom:
+  customDomain:
+    domainName: api.autostat.app
+    basePath: ''
+    stage: ${self:provider.stage}
+    createRoute53Record: true
+    endpointType: regional
+    securityPolicy: tls_1_2
+    apiType: rest
+    autoDomain: true
   environment:
     local: ${file(./config/local.env.json)}
     dev:
@@ -102,6 +111,8 @@ custom:
     origins:
       - http://localhost:5173
       - http://autostat-frontend-dev.s3-website-us-east-1.amazonaws.com
+      - https://autostat.app
+      - https://d26x71430m93jn.cloudfront.net
     headers:
       - Content-Type
       - Authorization
@@ -112,4 +123,13 @@ custom:
       - DELETE
       - OPTIONS
   serverlessPluginTypescript:
-    tsConfigFileLocation: './tsconfig.json' 
+    tsConfigFileLocation: './tsconfig.json'
+
+resources:
+  Outputs:
+    ApiId:
+      Description: "API Gateway ID"
+      Value: 
+        Ref: ApiGatewayRestApi
+      Export:
+        Name: autostat-api-id 

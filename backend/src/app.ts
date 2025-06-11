@@ -10,7 +10,23 @@ const app: Express = express();
 
 // CORS configuration
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://autostat-frontend-dev.s3-website-us-east-1.amazonaws.com'],
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://autostat-frontend-dev.s3-website-us-east-1.amazonaws.com',
+      'https://autostat.app',
+      'https://d26x71430m93jn.cloudfront.net'
+    ];
+    
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: [
     'Content-Type',
@@ -20,7 +36,8 @@ app.use(cors({
     'X-Amz-Security-Token',
     'X-Amz-User-Agent'
   ],
-  credentials: true
+  credentials: true,
+  maxAge: 86400 // 24 hours
 }));
 
 // Middleware for parsing JSON bodies

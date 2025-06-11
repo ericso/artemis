@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'API Gateway Custom Domain for AutoStat API'
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: api.autostat.app
+    Description: The domain name for the API
+
+  HostedZoneId:
+    Type: String
+    Default: Z07218843JZARBW9LMGQJ
+    Description: The Route 53 Hosted Zone ID
+
+  Stage:
+    Type: String
+    Default: dev
+    Description: The API Gateway stage to map
+
+Resources:
+  CustomDomain:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName: !Ref DomainName
+      RegionalCertificateArn: !ImportValue autostat-api-certificate-arn
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      SecurityPolicy: TLS_1_2
+
+  DNSRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DomainName
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt CustomDomain.RegionalDomainName
+        HostedZoneId: !GetAtt CustomDomain.RegionalHostedZoneId
+        EvaluateTargetHealth: false
+
+  BasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    DependsOn: CustomDomain
+    Properties:
+      DomainName: !Ref DomainName
+      RestApiId: !ImportValue autostat-api-id
+      Stage: !Ref Stage
+
+Outputs:
+  ApiDomainName:
+    Description: Custom domain name for the API
+    Value: !Ref DomainName 

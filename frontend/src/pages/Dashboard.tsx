@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/stores/AuthContext';
 import { CarsPage } from '@/pages/CarsPage';
+import { EnvTest } from '@/components/EnvTest';
 
 function Dashboard() {
   const { user, logout } = useAuth();
@@ -42,8 +43,13 @@ function Dashboard() {
       </nav>
 
       {/* Main Content */}
-      <div style={{ flex: '1', overflow: 'hidden', backgroundColor: '#f9fafb' }}>
-        <CarsPage />
+      <div style={{ flex: '1', overflow: 'auto', backgroundColor: '#f9fafb', padding: '1rem' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+          <EnvTest />
+          <div style={{ marginTop: '1rem' }}>
+            <CarsPage />
+          </div>
+        </div>
       </div>
     </div>
   );

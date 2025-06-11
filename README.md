@@ -91,6 +91,19 @@ Required environment variables for production build:
 
 This URL is provided by the deploy script for the backend. It is provided at `frontend/.env.production`.
 
+### CloudFront Configuration
+The frontend is served through CloudFront with the following setup:
+- Custom domain: autostat.app
+- SSL certificate managed through AWS Certificate Manager
+- S3 bucket as the origin
+- Automatic cache invalidation on deployment
+
+Required environment variables for CloudFront deployment:
+- `CLOUDFRONT_DISTRIBUTION_ID` - CloudFront distribution ID
+- `CLOUDFRONT_DISTRIBUTION_ARN` - Full ARN of the CloudFront distribution
+
+These variables are managed by `scripts/setup-cloudfront-env.sh` and stored in `frontend/.env.cloudfront`.
+
 ### AWS Parameter Store
 The environment variables are provided by the AWS Parameter Store. To update these values from the command line, execute the following commands:
 ```bash

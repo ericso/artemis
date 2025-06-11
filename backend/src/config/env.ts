@@ -12,21 +12,40 @@ interface EnvConfig {
 }
 
 function loadConfig(): EnvConfig {
-  const environment = process.env.NODE_ENV === 'test' ? 'test' : 
-                     process.env.NODE_ENV === 'development' ? 'dev' : 'local';
-  
-  const configPath = resolve(__dirname, `../../config/${environment}.env.json`);
-  try {
-    return JSON.parse(readFileSync(configPath, 'utf-8'));
-  } catch (error) {
-    console.error(`Failed to load config for ${environment} environment`);
-    console.error(`Make sure ${configPath} exists and is properly formatted`);
-    console.error(`You can copy ${environment}.example.json to ${environment}.env.json and update the values`);
-    throw error;
+  // Only load from file in local environment
+  if (process.env.NODE_ENV === 'local') {
+    const configPath = resolve(__dirname, '../../config/local.env.json');
+    try {
+      return JSON.parse(readFileSync(configPath, 'utf-8'));
+    } catch (error) {
+      console.error('Failed to load config for local environment');
+      console.error(`Make sure ${configPath} exists and is properly formatted`);
+      console.error('You can copy local.example.json to local.env.json and update the values');
+      throw error;
+    }
   }
+
+  // For non-local environments, use environment variables
+  return {
+    DB_HOST: process.env.DB_HOST || '',
+    DB_USER: process.env.DB_USER || '',
+    DB_PASSWORD: process.env.DB_PASSWORD || '',
+    DB_NAME: process.env.DB_NAME || '',
+    DB_PORT: process.env.DB_PORT || '5432',
+    JWT_SECRET: process.env.JWT_SECRET || '',
+    FRONTEND_URL: process.env.FRONTEND_URL || ''
+  };
 }
 
 const config = loadConfig();
+
+// Validate required environment variables
+const requiredEnvVars = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME', 'JWT_SECRET', 'FRONTEND_URL'];
+for (const envVar of requiredEnvVars) {
+  if (!config[envVar as keyof EnvConfig]) {
+    throw new Error(`Required environment variable ${envVar} is not set`);
+  }
+}
 
 export const env = {
   NODE_ENV: process.env.NODE_ENV || 'local',

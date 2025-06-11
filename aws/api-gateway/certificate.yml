@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'SSL Certificate for API Gateway Custom Domain'
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: api.autostat.app
+    Description: The domain name for the API
+
+  HostedZoneId:
+    Type: String
+    Default: Z07218843JZARBW9LMGQJ
+    Description: The Route 53 Hosted Zone ID
+
+Resources:
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref DomainName
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: !Ref DomainName
+          HostedZoneId: !Ref HostedZoneId
+
+Outputs:
+  CertificateArn:
+    Description: ARN of the SSL certificate
+    Value: !Ref Certificate
+    Export:
+      Name: autostat-api-certificate-arn 

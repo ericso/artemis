@@ -2,7 +2,7 @@ import { Pool, PoolConfig } from 'pg';
 import { resolve } from 'path';
 import { readFileSync } from 'fs';
 
-type Environment = 'local' | 'dev' | 'prod';
+type Environment = 'local' | 'dev';
 
 interface MigrationConfig {
   pool: Pool;
@@ -53,7 +53,6 @@ function getPoolConfig(environment: Environment): PoolConfig {
         connectionTimeoutMillis: 5000,
       };
     case 'dev':
-    case 'prod':
       return {
         ...poolConfig,
         max: 1,

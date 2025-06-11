@@ -8,11 +8,19 @@ import { env } from '@config/env';
 
 const app: Express = express();
 
-// Basic CORS configuration
+// CORS configuration
 app.use(cors({
-  origin: env.FRONTEND_URL,
+  origin: ['http://localhost:5173', 'http://autostat-frontend-dev.s3-website-us-east-1.amazonaws.com'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Amz-Date',
+    'X-Api-Key',
+    'X-Amz-Security-Token',
+    'X-Amz-User-Agent'
+  ],
+  credentials: true
 }));
 
 // Middleware for parsing JSON bodies

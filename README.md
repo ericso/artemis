@@ -32,7 +32,7 @@ Each component (backend/frontend) has its own development workflow and requireme
 
 ### Backend Deployment
 
-The backend is deployed as an AWS Lambda function using the [Serverless Framework](www.serverless.com). Key deployment files:
+The backend is deployed as an AWS Lambda function using the [Serverless Framework](https://www.serverless.com). Key deployment files:
 
 - `backend/serverless.yml` - Serverless Framework configuration
 - `backend/src/lambda.ts` - Lambda handler with CORS configuration

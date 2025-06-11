@@ -33,8 +33,14 @@ async function resolveSSMParameter(paramRef: string): Promise<string> {
     console.log(`Resolved ${paramName} to: ${paramName.includes('password') ? '******' : value}`);
     return value;
   } catch (error) {
-    console.error(`Failed to resolve SSM parameter ${paramName}:`, error);
-    throw error;
+    console.log(`SSM parameter ${paramName} not found, using value from config file`);
+    // If SSM parameter doesn't exist, extract and return the default value if present
+    const defaultValue = paramRef.match(/\${ssm:[^}]+,\s*default=([^}]+)}/)?.[1];
+    if (defaultValue) {
+      return defaultValue;
+    }
+    // If no default value, return the raw value from the config file
+    return paramRef.replace(/\${ssm:[^}]+}/, '');
   }
 }
 

@@ -63,7 +63,6 @@ The `aws/` directory contains configuration files and scripts for AWS infrastruc
 - SSM user data script for instance configuration
 - AWS CLI installation scripts
 
-
 ## Continuous Integration
 
 The project uses GitHub Actions for continuous integration. The following checks are run on each pull request and push to the main branch:
@@ -106,7 +105,6 @@ aws ssm put-parameter --name "/autostat/dev/frontend/url" --value "VALUE" --type
 ```
 
 The `/autostat/dev/frontend/url` is the URL from which the static asset frontend is served.
-
 
 ### Security Group ID and Subnet IDs
 Additionally, AWS has security group and subnets setup. These are the parameter store keys for setting these values.

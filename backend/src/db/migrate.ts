@@ -70,6 +70,8 @@ async function confirmRollback(environment: string): Promise<boolean> {
 }
 
 async function migrate(direction: 'up' | 'down' = 'up', environment: string = 'local'): Promise<void> {
+  console.log(`Running ${direction} migrations in ${environment} environment...`);
+  
   const pool = await getPool(environment);
   const client = await pool.connect();
   
@@ -79,11 +81,16 @@ async function migrate(direction: 'up' | 'down' = 'up', environment: string = 'l
     
     if (direction === 'up') {
       const executedMigrations = await getExecutedMigrations(client);
+      console.log('\nPending migrations:');
       
       for (const migration of migrations) {
         if (!executedMigrations.includes(migration.name)) {
+          console.log(`  → Executing migration: ${migration.name}`);
           await migration.up(client);
           await recordMigration(client, migration.name);
+          console.log(`  ✓ Completed migration: ${migration.name}`);
+        } else {
+          console.log(`  • Skipping migration: ${migration.name} (already executed)`);
         }
       }
     } else {
@@ -94,11 +101,16 @@ async function migrate(direction: 'up' | 'down' = 'up', environment: string = 'l
       }
 
       const executedMigrations = await getExecutedMigrations(client);
+      console.log('\nRolling back migrations:');
       
       for (const migration of [...migrations].reverse()) {
         if (executedMigrations.includes(migration.name)) {
+          console.log(`  → Rolling back migration: ${migration.name}`);
           await migration.down(client);
           await removeMigration(client, migration.name);
+          console.log(`  ✓ Rolled back migration: ${migration.name}`);
+        } else {
+          console.log(`  • Skipping rollback: ${migration.name} (not executed)`);
         }
       }
 
@@ -106,8 +118,10 @@ async function migrate(direction: 'up' | 'down' = 'up', environment: string = 'l
     }
 
     await client.query('COMMIT');
+    console.log('\nMigration completed successfully!\n');
   } catch (error) {
     await client.query('ROLLBACK');
+    console.error('\nMigration failed:', error);
     throw error;
   } finally {
     client.release();

@@ -13,8 +13,8 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint --fix \"src/**/*.{ts,tsx}\"",
     "format": "prettier --write src/",
-    "deploy": "npm run type-check && npm run build && aws s3 sync dist/ s3://artemis-frontend-dev --delete",
-    "deploy:prod": "npm run type-check && npm run build && aws s3 sync dist/ s3://artemis-frontend-prod --delete"
+    "deploy": "npm run type-check && npm run build && aws s3 sync dist/ s3://autostat-frontend-dev --delete",
+    "deploy:prod": "npm run type-check && npm run build && aws s3 sync dist/ s3://autostat-frontend-prod --delete"
   },
   "dependencies": {
     "@testing-library/jest-dom": "^6.6.3",

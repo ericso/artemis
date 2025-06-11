@@ -1,7 +1,7 @@
 {
-  "name": "prometheus-monorepo",
+  "name": "autostat-app",
   "version": "1.0.0",
-  "description": "Prometheus Monorepo",
+  "description": "Fullstack applicadtion for the AutoStat App",
   "private": true,
   "workspaces": [
     "frontend",

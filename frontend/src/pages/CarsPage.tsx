@@ -69,12 +69,6 @@ export const CarsPage: React.FC = () => {
     }
   };
 
-  const handleEditCar = (car: Car) => {
-    setSelectedCar(car);
-    setShowCarForm(true);
-    setShowFillupForm(false);
-  };
-
   const handleCancelCarForm = () => {
     setShowCarForm(false);
     setSelectedCar(undefined);

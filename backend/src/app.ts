@@ -11,13 +11,6 @@ const app: Express = express();
 // CORS configuration
 app.use(cors({
   origin: (origin, callback) => {
-    const allowedOrigins = [
-      'http://localhost:5173',
-      'http://autostat-frontend-dev.s3-website-us-east-1.amazonaws.com',
-      'https://autostat.app',
-      'https://d26x71430m93jn.cloudfront.net'
-    ];
-    
     // Log the incoming origin for debugging
     console.log('Express CORS - Incoming Origin:', origin);
     
@@ -27,7 +20,7 @@ app.use(cors({
       return callback(null, true);
     }
     
-    if (allowedOrigins.includes(origin)) {
+    if (env.CORS_ALLOWED_ORIGINS.includes(origin)) {
       console.log('Express CORS - Origin allowed:', origin);
       callback(null, origin);
     } else {

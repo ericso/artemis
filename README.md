@@ -84,6 +84,7 @@ Required environment variables for production deployment:
 - `DB_PASSWORD` - Database password
 - `JWT_SECRET` - Secret for JWT token signing
 - `FRONTEND_URL` - Frontend application URL (for CORS)
+- `CORS_ALLOWED_ORIGINS` - Comma-separated list of allowed origins for CORS
 
 ### Frontend
 Required environment variables for production build:
@@ -115,9 +116,11 @@ aws ssm put-parameter --name "/autostat/dev/db/port" --value "VALUE" --type "Sec
 
 aws ssm put-parameter --name "/autostat/dev/jwt/secret" --value "VALUE" --type "SecureString" --overwrite
 aws ssm put-parameter --name "/autostat/dev/frontend/url" --value "VALUE" --type "SecureString" --overwrite
+aws ssm put-parameter --name "/autostat/dev/cors/allowed_origins" --value "VALUE" --type "SecureString" --overwrite
 ```
 
 The `/autostat/dev/frontend/url` is the URL from which the static asset frontend is served.
+The `/autostat/dev/cors/allowed_origins` should be a comma-separated list of allowed origins (e.g., "https://autostat.app,https://d26x71430m93jn.cloudfront.net").
 
 ### Security Group ID and Subnet IDs
 Additionally, AWS has security group and subnets setup. These are the parameter store keys for setting these values.
@@ -126,3 +129,31 @@ aws ssm put-parameter --name "/autostat/dev/vpc/securityGroupId" --value "VALUE"
 aws ssm put-parameter --name "/autostat/dev/vpc/subnetId1" --value "VALUE" --type "SecureString" --overwrite
 aws ssm put-parameter --name "/autostat/dev/vpc/subnetId2" --value "VALUE" --type "SecureString" --overwrite
 ```
+
+### CORS Configuration
+The application uses a flexible CORS configuration that can be updated without code changes:
+
+1. **Local Development**:
+   - Configure in `backend/config/local.env.json`:
+   ```json
+   {
+     "CORS_ALLOWED_ORIGINS": "http://localhost:5173,http://localhost:3000"
+   }
+   ```
+
+2. **Development Environment**:
+   - Set via AWS Parameter Store:
+   ```bash
+   aws ssm put-parameter \
+     --name "/autostat/dev/cors/allowed_origins" \
+     --value "http://localhost:5173,https://autostat.app,https://d26x71430m93jn.cloudfront.net" \
+     --type "SecureString" \
+     --overwrite
+   ```
+
+3. **Production Environment**:
+   - Similarly configured via AWS Parameter Store with production URLs
+   - Example origins might include:
+     - Main domain (https://autostat.app)
+     - CloudFront distribution (https://d26x71430m93jn.cloudfront.net)
+     - Any additional domains or subdomains

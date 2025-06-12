@@ -16,16 +16,16 @@ npm install
 ```
 
 2. Set up AWS Systems Manager Parameter Store with the following parameters:
-   - /artemis/{stage}/db/host
-   - /artemis/{stage}/db/user
-   - /artemis/{stage}/db/password
-   - /artemis/{stage}/db/name
-   - /artemis/{stage}/db/port
-   - /artemis/{stage}/jwt/secret
-   - /artemis/{stage}/frontend/url
-   - /artemis/{stage}/vpc/securityGroupId
-   - /artemis/{stage}/vpc/subnetId1
-   - /artemis/{stage}/vpc/subnetId2
+   - /autostat/{stage}/db/host
+   - /autostat/{stage}/db/user
+   - /autostat/{stage}/db/password
+   - /autostat/{stage}/db/name
+   - /autostat/{stage}/db/port
+   - /autostat/{stage}/jwt/secret
+   - /autostat/{stage}/frontend/url
+   - /autostat/{stage}/vpc/securityGroupId
+   - /autostat/{stage}/vpc/subnetId1
+   - /autostat/{stage}/vpc/subnetId2
 
 3. Create Aurora Serverless v2 cluster in AWS:
    - Use the AWS Console or CLI to create an Aurora Serverless v2 cluster
@@ -411,6 +411,45 @@ Required configuration variables:
 - `DB_PORT`: Database port
 - `JWT_SECRET`: Secret for JWT token generation
 - `FRONTEND_URL`: URL of the frontend application
+- `CORS_ALLOWED_ORIGINS`: Comma-separated list of allowed origins for CORS
+
+### CORS Configuration
+
+The application supports flexible CORS configuration through environment variables:
+
+1. **Format**:
+   - Comma-separated list of allowed origins
+   - Example: `"http://localhost:5173,https://autostat.app,https://d26x71430m93jn.cloudfront.net"`
+
+2. **Local Development**:
+   ```json
+   {
+     "CORS_ALLOWED_ORIGINS": "http://localhost:5173,http://localhost:3000"
+   }
+   ```
+
+3. **AWS Environments**:
+   - Configured via AWS Systems Manager Parameter Store
+   - Parameter name: `/autostat/{stage}/cors/allowed_origins`
+   - Example:
+     ```bash
+     aws ssm put-parameter \
+       --name "/autostat/dev/cors/allowed_origins" \
+       --value "http://localhost:5173,https://autostat.app" \
+       --type "SecureString" \
+       --overwrite
+     ```
+
+4. **Security Considerations**:
+   - Always use full URLs including protocol (http/https)
+   - Avoid using wildcards (*) for production environments
+   - Include both www and non-www versions if needed
+   - Consider adding development/staging domains for testing
+
+5. **Updating CORS Settings**:
+   - Changes to CORS settings require redeployment
+   - No code changes needed, just update the environment variable
+   - Remember to update both API Gateway and Express CORS settings
 
 ## Available Scripts
 

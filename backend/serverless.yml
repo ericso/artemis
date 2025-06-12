@@ -14,6 +14,7 @@ provider:
     DB_PORT: ${self:custom.environment.${self:provider.stage}.DB_PORT}
     JWT_SECRET: ${self:custom.environment.${self:provider.stage}.JWT_SECRET}
     FRONTEND_URL: ${self:custom.environment.${self:provider.stage}.FRONTEND_URL}
+    CORS_ALLOWED_ORIGINS: ${self:custom.environment.${self:provider.stage}.CORS_ALLOWED_ORIGINS}
   vpc:
     securityGroupIds:
       - ${ssm:'/autostat/dev/vpc/securityGroupId'}
@@ -110,6 +111,7 @@ custom:
       DB_PORT: ${ssm:'/autostat/dev/db/port'}
       JWT_SECRET: ${ssm:'/autostat/dev/jwt/secret'}
       FRONTEND_URL: ${ssm:'/autostat/dev/frontend/url'}
+      CORS_ALLOWED_ORIGINS: ${ssm:'/autostat/dev/cors/allowed_origins'}
   serverless-offline:
     httpPort: 3000
     host: localhost
@@ -118,14 +120,14 @@ custom:
     keepAlive: true
     lambdaTimeout: 60
   cors:
-    origins:
-      - http://localhost:5173
-      - http://autostat-frontend-dev.s3-website-us-east-1.amazonaws.com
-      - https://autostat.app
-      - https://d26x71430m93jn.cloudfront.net
+    origins: ${self:custom.environment.${self:provider.stage}.CORS_ALLOWED_ORIGINS}
     headers:
       - Content-Type
       - Authorization
+      - X-Amz-Date
+      - X-Api-Key
+      - X-Amz-Security-Token
+      - X-Amz-User-Agent
     methods:
       - GET
       - POST

@@ -8,6 +8,7 @@ import './register-paths';
 import serverless from 'serverless-http';
 import app from './app';
 import { Handler, APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
+import { env } from '@config/env';
 
 const serverlessHandler = serverless(app);
 
@@ -15,18 +16,11 @@ const getAllowedOrigin = (origin: string | undefined): string | undefined => {
   // Log the incoming origin
   console.log('Incoming Origin:', origin);
   
-  const allowedOrigins = [
-    'http://localhost:5173',
-    'http://autostat-frontend-dev.s3-website-us-east-1.amazonaws.com',
-    'https://autostat.app',
-    'https://d26x71430m93jn.cloudfront.net'
-  ];
-  
   // Log all request headers for debugging
-  console.log('Allowed Origins:', allowedOrigins);
+  console.log('Allowed Origins:', env.CORS_ALLOWED_ORIGINS);
   
   // If no origin or not in allowed list, return undefined to prevent CORS header from being set
-  if (!origin || !allowedOrigins.includes(origin)) {
+  if (!origin || !env.CORS_ALLOWED_ORIGINS.includes(origin)) {
     console.log('Origin not allowed:', origin);
     return undefined;
   }

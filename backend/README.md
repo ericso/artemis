@@ -37,6 +37,9 @@ npm install
 npm run migrate
 ```
 
+Note: currently migrations are unable to easily be run against the deployed Aurora cluster.
+There is active work to fill this gap using a Lambda job to run new migrations.
+
 ## Development
 
 For local development:
@@ -44,7 +47,7 @@ For local development:
 npm run dev
 ```
 
-This will start the server locally using serverless-offline.
+This will start the server locally using express. The serverless-offline deployment was removed due to difficulties and was deemed unnecessary.
 
 ## Deployment
 
@@ -55,8 +58,10 @@ npm run deploy
 
 Deploy to production:
 ```bash
-npm run deploy:prod
+# npm run deploy:prod
 ```
+
+Note: currently there is no production environment. There is a single environment that is called `dev`.
 
 ## Architecture
 
@@ -92,7 +97,7 @@ npm run deploy:prod
 - RESTful API design
 - TypeScript support
 
-## Quick Start
+## Quick Start (Local Environment)
 
 1. Install dependencies:
 ```bash
@@ -101,18 +106,18 @@ npm install
 ```
 
 2. Configure environment variables:
-Create a `.env` file in the `backend` directory with:
-```env
-PORT=3000
-DATABASE_URL=postgresql://user:password@localhost:5432/artemis
-JWT_SECRET=your_secure_secret_key  # Required in production, defaults to 'just-for-dev' in development
-
-# Alternative Database Configuration
-DB_USER=your_db_user
-DB_HOST=your_db_host
-DB_NAME=your_db_name
-DB_PASSWORD=your_db_password
-DB_PORT=5432
+Create a `local.env.json` file in the `backend/config` directory with:
+```json
+{
+  "DB_HOST": "localhost",
+  "DB_USER": "your_db_user",
+  "DB_PASSWORD": "your_db_password",
+  "DB_NAME": "your_db_name",
+  "DB_PORT": "5432",
+  "JWT_SECRET": "your_secure_secret_key",
+  "FRONTEND_URL": "http://localhost:5173",
+  "CORS_ALLOWED_ORIGINS": "http://localhost:5173"
+}
 ```
 
 Note: For production environments, always set a secure JWT_SECRET. The default development value should not be used in production.
@@ -152,14 +157,7 @@ npm run test:watch
 npm run test:coverage
 ```
 
-### Production Build
-
-```bash
-npm run build
-npm start
-```
-
-## Application Structure
+### Application Structure
 
 ```
 backend/
@@ -186,34 +184,33 @@ npm install <package> --workspace=backend
 
 ## API Structure
 
-The API follows RESTful conventions and is versioned. All endpoints are prefixed with `/api/v1/`.
-
-### Authentication
-
-All requests to authenticated endpoints must include a valid JWT token in the Authorization header:
-```
-Authorization: Bearer <token>
-```
+The API is a RESTful API.
 
 ### Available Endpoints
 
 #### Public Endpoints (No Authentication Required)
-- `POST /api/v1/auth/login` - User login
-- `POST /api/v1/auth/register` - User registration
-- `POST /api/v1/auth/refresh` - Refresh access token using a valid refresh token
+- `POST /auth/login` - User login
+- `POST /auth/register` - User registration
+- `POST /auth/refresh` - Refresh access token using a valid refresh token
 
 #### Authenticated Endpoints (Require Valid JWT)
-- **Cars**
-  - `GET /api/v1/cars` - List all cars owned by the authenticated user
-  - `POST /api/v1/cars` - Create a new car
-  - `GET /api/v1/cars/:id` - Get details of a specific car
-  - `PUT /api/v1/cars/:id` - Update a car's details
-  - `DELETE /api/v1/cars/:id` - Delete a car
-
 - **User**
-  - `GET /api/v1/user/profile` - Get authenticated user's profile
-  - `PUT /api/v1/user/profile` - Update user profile
-  - `PUT /api/v1/user/password` - Change password
+  - `GET /user/profile` - Get authenticated user's profile
+  - `PUT /user/profile` - Update user profile
+  - `PUT /user/password` - Change password
+
+- **Cars**
+  - `GET /cars` - List all cars owned by the authenticated user
+  - `POST /cars` - Create a new car
+  - `GET /cars/:id` - Get details of a specific car
+  - `PUT /cars/:id` - Update a car's details
+  - `DELETE /cars/:id` - Delete a car
+
+- **Fillups**
+  - `GET /fillups` - List all fillups (optionally filtered by carId)
+  - `POST /fillups` - Create a new fillup
+  - `PUT /fillups/:id` - Update a fillup's details
+  - `DELETE /fillups/:id` - Delete a fillup
 
 Any request to an authenticated endpoint without a valid JWT token will receive a 401 Unauthorized response:
 ```json
@@ -225,21 +222,24 @@ Any request to an authenticated endpoint without a valid JWT token will receive 
 }
 ```
 
+### Authentication
+
+All requests to authenticated endpoints must include a valid JWT token in the Authorization header:
+```
+Authorization: Bearer <token>
+```
+
 ## Database
 
 ### Migrations
 
 The application uses a simple migration system located in `src/db/migrate.ts`. Migrations are executed in order and can be rolled back if needed.
 
-Current migrations:
-1. Create users table (`001_create_users_table`)
-2. Create cars table (`002_create_cars_table`) - Stores vehicle information with user ownership
-
 To create new migrations:
-1. Create migration file in `src/db/migrations/` using the format: `YYYYMMDDHHMMSS_description.ts`
-2. Add up/down SQL
-3. Test migration and rollback
-4. Update relevant models
+1. Create migration file in `src/db/migrations/` using the format: `YYYYMMDDHHMMSS_description.ts`.
+2. Add up/down SQL.
+3. Add the migration to the `src/db/migrate.ts` file.
+4. Update relevant models.
 
 ### Migration Safety
 

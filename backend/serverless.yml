@@ -46,7 +46,11 @@ functions:
           path: /health
           method: GET
           cors:
-            origin: '*'
+            origins:
+              - http://localhost:5173
+              - http://autostat-frontend-dev.s3-website-us-east-1.amazonaws.com
+              - https://autostat.app
+              - https://d26x71430m93jn.cloudfront.net
             headers:
               - Content-Type
               - X-Amz-Date
@@ -54,12 +58,17 @@ functions:
               - X-Api-Key
               - X-Amz-Security-Token
               - X-Amz-User-Agent
+              - Access-Control-Allow-Credentials
             allowCredentials: true
       - http:
           path: /{proxy+}
           method: ANY
           cors:
-            origin: '*'
+            origins:
+              - http://localhost:5173
+              - http://autostat-frontend-dev.s3-website-us-east-1.amazonaws.com
+              - https://autostat.app
+              - https://d26x71430m93jn.cloudfront.net
             headers:
               - Content-Type
               - X-Amz-Date
@@ -67,6 +76,7 @@ functions:
               - X-Api-Key
               - X-Amz-Security-Token
               - X-Amz-User-Agent
+              - Access-Control-Allow-Credentials
             allowCredentials: true
     timeout: 60
     memorySize: 1024

@@ -18,12 +18,20 @@ app.use(cors({
       'https://d26x71430m93jn.cloudfront.net'
     ];
     
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    // Log the incoming origin for debugging
+    console.log('Express CORS - Incoming Origin:', origin);
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) {
+      console.log('Express CORS - No origin provided');
+      return callback(null, true);
+    }
+    
+    if (allowedOrigins.includes(origin)) {
+      console.log('Express CORS - Origin allowed:', origin);
+      callback(null, origin);
     } else {
+      console.log('Express CORS - Origin not allowed:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -35,6 +43,12 @@ app.use(cors({
     'X-Api-Key',
     'X-Amz-Security-Token',
     'X-Amz-User-Agent'
+  ],
+  exposedHeaders: [
+    'Access-Control-Allow-Origin',
+    'Access-Control-Allow-Credentials',
+    'Access-Control-Allow-Methods',
+    'Access-Control-Allow-Headers'
   ],
   credentials: true,
   maxAge: 86400 // 24 hours

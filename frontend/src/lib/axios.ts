@@ -2,23 +2,22 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-export const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
-
-// Create axios instance with base URL
-const axiosInstance = axios.create({
+// Common axios config
+const commonConfig = {
   baseURL: API_URL.replace(/\/$/, ''), // Remove trailing slash if present
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   },
-  withCredentials: false,
+  withCredentials: true,
   timeout: 30000 // 30 second timeout
-});
+};
+
+// Create main axios instance
+export const api = axios.create(commonConfig);
+
+// Create axios instance with auth interceptor
+const axiosInstance = axios.create(commonConfig);
 
 // Add request interceptor to include auth token
 axiosInstance.interceptors.request.use(

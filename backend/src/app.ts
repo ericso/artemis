@@ -11,18 +11,13 @@ const app: Express = express();
 // CORS configuration
 app.use(cors({
   origin: (origin, callback) => {
-    const allowedOrigins = [
-      'http://localhost:5173',
-      'http://autostat-frontend-dev.s3-website-us-east-1.amazonaws.com',
-      'https://autostat.app',
-      'https://d26x71430m93jn.cloudfront.net'
-    ];
-    
     // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      return callback(null, true);
+    }
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
+    if (env.CORS_ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, origin);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
@@ -35,6 +30,12 @@ app.use(cors({
     'X-Api-Key',
     'X-Amz-Security-Token',
     'X-Amz-User-Agent'
+  ],
+  exposedHeaders: [
+    'Access-Control-Allow-Origin',
+    'Access-Control-Allow-Credentials',
+    'Access-Control-Allow-Methods',
+    'Access-Control-Allow-Headers'
   ],
   credentials: true,
   maxAge: 86400 // 24 hours

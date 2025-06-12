@@ -9,6 +9,7 @@ interface EnvConfig {
   DB_PORT: string;
   JWT_SECRET: string;
   FRONTEND_URL: string;
+  CORS_ALLOWED_ORIGINS: string;
 }
 
 function loadConfig(): EnvConfig {
@@ -33,14 +34,15 @@ function loadConfig(): EnvConfig {
     DB_NAME: process.env.DB_NAME || '',
     DB_PORT: process.env.DB_PORT || '5432',
     JWT_SECRET: process.env.JWT_SECRET || '',
-    FRONTEND_URL: process.env.FRONTEND_URL || ''
+    FRONTEND_URL: process.env.FRONTEND_URL || '',
+    CORS_ALLOWED_ORIGINS: process.env.CORS_ALLOWED_ORIGINS || ''
   };
 }
 
 const config = loadConfig();
 
 // Validate required environment variables
-const requiredEnvVars = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME', 'JWT_SECRET', 'FRONTEND_URL'];
+const requiredEnvVars = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME', 'JWT_SECRET', 'FRONTEND_URL', 'CORS_ALLOWED_ORIGINS'];
 for (const envVar of requiredEnvVars) {
   if (!config[envVar as keyof EnvConfig]) {
     throw new Error(`Required environment variable ${envVar} is not set`);
@@ -51,6 +53,7 @@ export const env = {
   NODE_ENV: process.env.NODE_ENV || 'local',
   PORT: parseInt(process.env.PORT || '3000', 10),
   FRONTEND_URL: config.FRONTEND_URL,
+  CORS_ALLOWED_ORIGINS: config.CORS_ALLOWED_ORIGINS.split(',').map(origin => origin.trim()),
   JWT: {
     SECRET: config.JWT_SECRET,
     EXPIRES_IN: '24h'

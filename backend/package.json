@@ -14,7 +14,7 @@
     "test:coverage": "NODE_ENV=test vitest run --coverage",
     "migrate": "ts-node -r tsconfig-paths/register src/db/migrate.ts",
     "migrate:down": "ts-node -r tsconfig-paths/register src/db/migrate.ts down",
-    "deploy": "serverless deploy",
+    "deploy": "npm run build && serverless deploy",
     "type-check": "tsc --noEmit",
     "lint": "eslint --fix \"src/**/*.{ts,tsx}\""
   },

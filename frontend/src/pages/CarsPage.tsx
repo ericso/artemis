@@ -123,9 +123,9 @@ export const CarsPage: React.FC = () => {
   }
 
   return (
-    <div className="h-full w-full flex flex-row">
+    <div className="h-full w-full flex flex-col lg:flex-row">
       {/* Left Sidebar - Car List */}
-      <div className="w-1/3 min-w-[300px] border-r border-gray-200 bg-gray-50 overflow-y-auto">
+      <div className="w-full lg:w-1/3 lg:min-w-[300px] border-b lg:border-r border-gray-200 bg-gray-50 overflow-y-auto">
         <div className="p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold text-gray-900">My Cars</h2>
@@ -144,7 +144,7 @@ export const CarsPage: React.FC = () => {
           </div>
         </div>
 
-        <div>
+        <div className="divide-y divide-gray-200">
           {cars.length === 0 ? (
             <div className="p-4 text-center text-gray-500">
               No cars found. Add your first car!
@@ -154,7 +154,7 @@ export const CarsPage: React.FC = () => {
               <div
                 key={car.id}
                 onClick={() => handleSelectCar(car)}
-                className={`p-4 cursor-pointer ${
+                className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
                   selectedCar?.id === car.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
                 }`}
               >
@@ -171,7 +171,7 @@ export const CarsPage: React.FC = () => {
       </div>
 
       {/* Right Content - Car Details/Form */}
-      <div className="flex-1 bg-white overflow-y-auto p-6">
+      <div className="flex-1 bg-white overflow-y-auto p-4 sm:p-6">
         {showCarForm ? (
           <>
             <div className="mb-6">
@@ -190,7 +190,7 @@ export const CarsPage: React.FC = () => {
           </>
         ) : selectedCar ? (
           <>
-            <div className="flex justify-between items-start mb-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-6">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">
                   {selectedCar.name || `${selectedCar.year} ${selectedCar.make} ${selectedCar.model}`}
@@ -199,30 +199,24 @@ export const CarsPage: React.FC = () => {
                   {selectedCar.make} {selectedCar.model} • {selectedCar.year}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="mt-4 sm:mt-0 flex gap-2">
                 <button
-                  onClick={() => handleEditCar(selectedCar)}
+                  onClick={() => setShowCarForm(true)}
                   className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                 >
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
                   Edit
                 </button>
                 <button
                   onClick={() => handleDeleteCar(selectedCar)}
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-red-600 bg-white hover:bg-gray-50"
+                  className="inline-flex items-center px-3 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
                 >
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
                   Delete
                 </button>
               </div>
             </div>
 
-            <div className="bg-gray-50 p-6 rounded-lg mb-6">
-              <dl className="grid grid-cols-2 gap-6">
+            <div className="bg-gray-50 p-4 sm:p-6 rounded-lg mb-6">
+              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <dt className="text-sm font-medium text-gray-500">Make</dt>
                   <dd className="mt-1 text-base font-medium text-gray-900">{selectedCar.make}</dd>
@@ -240,13 +234,13 @@ export const CarsPage: React.FC = () => {
                   <dd className="mt-1 text-base font-medium text-gray-900">{selectedCar.initial_mileage.toLocaleString()} miles</dd>
                 </div>
                 {selectedCar.vin && (
-                  <div>
+                  <div className="sm:col-span-2">
                     <dt className="text-sm font-medium text-gray-500">VIN</dt>
-                    <dd className="mt-1 text-base font-medium text-gray-900 font-mono">{selectedCar.vin}</dd>
+                    <dd className="mt-1 text-base font-medium text-gray-900 font-mono break-all">{selectedCar.vin}</dd>
                   </div>
                 )}
                 {selectedCar.name && (
-                  <div className="col-span-2">
+                  <div className="sm:col-span-2">
                     <dt className="text-sm font-medium text-gray-500">Nickname</dt>
                     <dd className="mt-1 text-base font-medium text-gray-900">{selectedCar.name}</dd>
                   </div>
@@ -288,19 +282,14 @@ export const CarsPage: React.FC = () => {
             </div>
           </>
         ) : (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-center">
-              <h3 className="text-sm font-medium text-gray-900">No car selected</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Select a car from the list to view its details
-              </p>
-            </div>
+          <div className="text-center text-gray-500 py-12">
+            <p>Select a car from the list or add a new one to get started.</p>
           </div>
         )}
       </div>
 
       {error && (
-        <div className="fixed bottom-4 right-4 bg-red-50 text-red-700 p-3 rounded-lg shadow-lg">
+        <div className="fixed bottom-4 right-4 bg-red-50 text-red-700 p-3 rounded-lg shadow-lg max-w-sm">
           <div className="flex">
             <div className="flex-shrink-0">
               <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

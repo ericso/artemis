@@ -12,27 +12,19 @@ function Dashboard() {
   };
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="min-h-screen flex flex-col">
       {/* Navigation Bar */}
-      <nav style={{ backgroundColor: 'white', borderBottom: '1px solid #e5e7eb' }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', height: '4rem', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#1f2937' }}>AutoStat</span>
+      <nav className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex items-center gap-6">
+              <span className="text-xl font-bold text-gray-900">AutoStat</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <span style={{ color: '#4b5563' }}>{user?.email}</span>
+            <div className="flex items-center gap-4">
+              <span className="text-gray-600 hidden sm:block">{user?.email}</span>
               <button
                 onClick={handleLogout}
-                style={{
-                  padding: '0.5rem 1rem',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '0.375rem',
-                  backgroundColor: 'white',
-                  color: '#4b5563',
-                  cursor: 'pointer',
-                  fontSize: '0.875rem'
-                }}
+                className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Logout
               </button>
@@ -42,8 +34,8 @@ function Dashboard() {
       </nav>
 
       {/* Main Content */}
-      <div style={{ flex: '1', overflow: 'auto', backgroundColor: '#f9fafb', padding: '1rem' }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+      <div className="flex-1 overflow-auto bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <CarsPage />
         </div>
       </div>

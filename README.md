@@ -2,13 +2,25 @@
 
 An app that tracks your cars and their mileage.
 
+I created this project as an exercise in making a full stack web app deployed via serverless architecture.
+- The backend is an [Express](https://expressjs.com/) server running on [Nodejs](https://nodejs.org) that exposes a RESTful API.
+- The frontend is a [React](https://react.dev/) web app using [Tailwind](https://tailwindcss.com/) for CSS.
+- The backend is deployed as an [AWS Lambda](https://aws.amazon.com/lambda/) function.
+- The Postgres database is deployed as an [AWS Aurora Serverless V2](https://aws.amazon.com/rds/aurora/serverless/) cluster.
+- The frontend static files are served via [AWS S3](https://aws.amazon.com/s3/) using [Cloudfront](https://aws.amazon.com/cloudfront/).
+
+Currently deployemnt is performed manually but work is being done to automate deployment via CI.
+
 ## Project Structure
+
+The backend and frontend are separated in their own directories, with their own package.json scripts.
+There is an AWS directory which houses config files used in the current frontend and backend deployment.
 
 ```
 autostat/
 ├── backend/         # Express.js backend
 ├── frontend/        # React frontend
-├── aws/            # AWS configuration and scripts
+├── aws/             # AWS configuration and scripts
 └── README.md        # This file
 ```
 
@@ -73,6 +85,8 @@ The project uses GitHub Actions for continuous integration. The following checks
 
 The workflow configuration can be found in `.github/workflows/test.yml`.
 
+In the future CI will handle deployment to the dev/prod enviroment.
+
 ## Environment Variables
 
 ### Backend
@@ -86,11 +100,13 @@ Required environment variables for production deployment:
 - `FRONTEND_URL` - Frontend application URL (for CORS)
 - `CORS_ALLOWED_ORIGINS` - Comma-separated list of allowed origins for CORS
 
+The backend enviroment variables are provided by JSON config files at `backend/config`.
+
 ### Frontend
 Required environment variables for production build:
 - `VITE_API_URL` - Backend API URL
 
-This URL is provided by the deploy script for the backend. It is provided at `frontend/.env.production`.
+The frontend environment variables are provided at `frontend/.env.production`.
 
 ### CloudFront Configuration
 The frontend is served through CloudFront with the following setup:
@@ -102,6 +118,7 @@ The frontend is served through CloudFront with the following setup:
 Required environment variables for CloudFront deployment:
 - `CLOUDFRONT_DISTRIBUTION_ID` - CloudFront distribution ID
 - `CLOUDFRONT_DISTRIBUTION_ARN` - Full ARN of the CloudFront distribution
+- `CLOUDFRONT_DOMAIN` - Domain of the CloudFront distribution
 
 These variables are managed by `scripts/setup-cloudfront-env.sh` and stored in `frontend/.env.cloudfront`.
 

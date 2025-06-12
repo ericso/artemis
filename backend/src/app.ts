@@ -11,20 +11,14 @@ const app: Express = express();
 // CORS configuration
 app.use(cors({
   origin: (origin, callback) => {
-    // Log the incoming origin for debugging
-    console.log('Express CORS - Incoming Origin:', origin);
-    
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) {
-      console.log('Express CORS - No origin provided');
       return callback(null, true);
     }
     
     if (env.CORS_ALLOWED_ORIGINS.includes(origin)) {
-      console.log('Express CORS - Origin allowed:', origin);
       callback(null, origin);
     } else {
-      console.log('Express CORS - Origin not allowed:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
